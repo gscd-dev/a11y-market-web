@@ -19,7 +19,10 @@ export const MainCarousel = ({ data }) => {
 
   return (
     <div className='flex w-full flex-col items-center justify-between lg:w-[80%] lg:flex-row-reverse'>
-      <div className='relative w-screen md:w-fit'>
+      <div
+        className='relative w-screen md:w-fit'
+        aria-label='메인 배너 컨테이너'
+      >
         <Carousel
           plugins={[autoPlay.current, fade.current]}
           opts={{
@@ -30,8 +33,12 @@ export const MainCarousel = ({ data }) => {
           onMouseEnter={autoPlay.current.stop}
           onMouseLeave={autoPlay.current.play}
           setApi={setApi}
+          aria-label='메인 배너 컨텐츠'
         >
-          <CarouselContent>
+          <CarouselContent
+            aria-label='메인 배너 캐러셀'
+            tabIndex={0}
+          >
             {data.map((item, _) => (
               <CarouselItem key={item.id}>
                 <div className='p-1'>
