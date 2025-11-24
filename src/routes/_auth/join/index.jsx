@@ -13,7 +13,7 @@ import {
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 
-export const Route = createFileRoute('/_auth/join')({
+export const Route = createFileRoute('/_auth/join/')({
   component: RouteComponent,
 });
 
@@ -156,7 +156,7 @@ function RouteComponent() {
           <Input
             id='phone'
             type='text'
-            placeholder='휴대폰 번호 입력 ("-" 제외 11자리 입력)'
+            placeholder="휴대폰 번호 입력 ('-' 제외 11자리 입력)"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />

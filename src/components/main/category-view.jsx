@@ -23,7 +23,10 @@ export function CategoryView({ categories, products, onSelectCategory }) {
       </header>
       <div className='grid w-full grid-cols-1 gap-4 px-16 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6'>
         {products.map((product) => (
-          <div className='p-1'>
+          <div
+            className='p-1'
+            key={product.id}
+          >
             <Card className='overflow-hidden pt-0 transition-transform hover:-translate-y-1 hover:opacity-90 hover:shadow-lg'>
               <CardContent className='flex aspect-square items-center justify-center p-0'>
                 <div className='h-full w-full bg-neutral-400'></div>

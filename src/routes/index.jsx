@@ -96,7 +96,7 @@ function HomePage() {
         </div>
         <div className='grid w-full grid-cols-2 gap-8 px-4 pb-16'>
           <Card className='flex flex-row items-center gap-0 px-8 py-4'>
-            <CardContent class='items-center justify-center'>
+            <CardContent className='items-center justify-center'>
               <Icon
                 icon='mdi:accessibility'
                 className='size-12 text-blue-500'
@@ -111,7 +111,7 @@ function HomePage() {
             </CardHeader>
           </Card>
           <Card className='flex flex-row items-center gap-0 px-8 py-4'>
-            <CardContent class='items-center justify-center'>
+            <CardContent className='items-center justify-center'>
               <Icon
                 icon='mdi:search'
                 className='size-12 text-green-500'
@@ -125,7 +125,7 @@ function HomePage() {
             </CardHeader>
           </Card>
           <Card className='flex flex-row items-center gap-0 px-8 py-4'>
-            <CardContent class='items-center justify-center'>
+            <CardContent className='items-center justify-center'>
               <Icon
                 icon='mdi:customer-service'
                 className='size-12 text-yellow-500'
@@ -139,7 +139,7 @@ function HomePage() {
             </CardHeader>
           </Card>
           <Card className='flex flex-row items-center gap-0 px-8 py-4'>
-            <CardContent class='items-center justify-center'>
+            <CardContent className='items-center justify-center'>
               <Icon
                 icon='mdi:arrow-up-bold-hexagon-outline'
                 className='size-12 text-purple-500'

@@ -26,7 +26,10 @@ export function RealtimeRanking({ data }) {
         >
           <CarouselContent className='gap-8 px-4'>
             {data?.map((item, _) => (
-              <div className='p-1'>
+              <div
+                className='p-1'
+                key={item.id}
+              >
                 <Card className='overflow-hidden pt-0 transition-transform hover:-translate-y-1 hover:opacity-90 hover:shadow-lg'>
                   <CardContent className='flex aspect-square w-3xs items-center justify-center p-0'>
                     <div className='h-full w-full bg-neutral-400'></div>

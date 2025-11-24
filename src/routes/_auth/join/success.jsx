@@ -5,7 +5,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Button } from '@/components/ui/button';
 import A11yOverlay from '@/components/A11y/A11yOverlay';
 
-export const Route = createFileRoute('/_auth/join/success/')({
+export const Route = createFileRoute('/_auth/join/success')({
   component: JoinSuccessPage,
 });
 
