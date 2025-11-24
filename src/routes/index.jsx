@@ -1,6 +1,6 @@
-import { CategoryView } from '@/components/CategoryView';
-import { MainCarousel } from '@/components/MainCarousel';
-import { RealtimeRanking } from '@/components/RealtimeRanking';
+import { CategoryView } from '@/components/main/category-view';
+import { MainCarousel } from '@/components/main/main-carousel';
+import { RealtimeRanking } from '@/components/main/main-carousel';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';

@@ -2,8 +2,8 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import TopBar from '@/components/TopBar';
-import Footer from '@/components/Footer';
+import TopBar from '@/components/layout/top-bar';
+import Footer from '@/components/layout/footer';
 import A11yButton from '@/components/A11y/A11yButton';
 
 export const Route = createRootRoute({
