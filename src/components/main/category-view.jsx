@@ -1,7 +1,10 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 export function CategoryView({ categories, products, onSelectCategory }) {
+  const navigate = useNavigate();
+
   return (
     <>
       <header
@@ -23,8 +26,10 @@ export function CategoryView({ categories, products, onSelectCategory }) {
       </header>
       <div className='grid w-full grid-cols-1 gap-4 px-16 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6'>
         {products.map((product) => (
-          <div
+          <Link
             className='p-1'
+            to='/products/$productId'
+            params={{ productId: product.id }}
             key={product.id}
           >
             <Card className='overflow-hidden pt-0 transition-transform hover:-translate-y-1 hover:opacity-90 hover:shadow-lg'>
@@ -36,12 +41,13 @@ export function CategoryView({ categories, products, onSelectCategory }) {
                 <span className='text-md font-bold text-neutral-600'>{product.price + '원'}</span>
               </CardFooter>
             </Card>
-          </div>
+          </Link>
         ))}
       </div>
       <Button
         variant='default'
         className='mx-auto mt-4 w-3xs px-8 hover:opacity-80'
+        onClick={() => navigate({ to: '/products' })}
       >
         전체 상품 보기
       </Button>

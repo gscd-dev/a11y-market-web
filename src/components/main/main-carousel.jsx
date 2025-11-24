@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
 import { Icon } from '@iconify/react';
+import { Link } from '@tanstack/react-router';
 import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import { useRef, useState } from 'react';
@@ -41,13 +42,17 @@ export const MainCarousel = ({ data }) => {
           >
             {data.map((item, _) => (
               <CarouselItem key={item.id}>
-                <div className='p-1'>
+                <Link
+                  className='p-1'
+                  to='/events/$eventId'
+                  params={{ eventId: item.id }} // 동적 세그먼트에 맞게 설정 추후 eventId에 맞게 변경 필요
+                >
                   <Card className='bg-neutral-400'>
                     <CardContent className='flex aspect-3/2 items-center justify-center p-6'>
                       <span className='text-4xl font-semibold'>{item.title}</span>
                     </CardContent>
                   </Card>
-                </div>
+                </Link>
               </CarouselItem>
             ))}
           </CarouselContent>

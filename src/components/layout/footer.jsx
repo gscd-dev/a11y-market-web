@@ -36,7 +36,7 @@ export default function Footer() {
           />
           <Separator
             orientation='vertical'
-            className='mx-6 hidden min-h-30 bg-neutral-400 xl:block dark:bg-neutral-500'
+            className='hidden min-h-30 bg-neutral-400 xl:block dark:bg-neutral-500'
           />
           <div className='grid flex-1 grid-cols-2 gap-x-8 gap-y-2 text-base'>
             <ul
@@ -86,7 +86,7 @@ export default function Footer() {
           />
           <Separator
             orientation='vertical'
-            className='mx-6 hidden min-h-30 bg-neutral-400 xl:block dark:bg-neutral-500'
+            className='hidden min-h-30 bg-neutral-400 xl:block dark:bg-neutral-500'
           />
           <div className='flex-1'>
             <ul aria-label='회사 정보'>

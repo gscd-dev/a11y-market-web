@@ -59,7 +59,7 @@ export default function TopBar() {
           </li>
           <li aria-label='마이페이지'>
             <Link
-              to='/profile'
+              to='/mypage'
               className={itemStyle}
               aria-label='마이페이지로 이동'
             >

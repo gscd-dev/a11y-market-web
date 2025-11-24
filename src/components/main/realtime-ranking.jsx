@@ -4,9 +4,11 @@ import { Carousel, CarouselContent } from '@/components/ui/carousel';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { Link, useNavigate } from '@tanstack/react-router';
 
 export function RealtimeRanking({ data }) {
   const [api, setApi] = useState();
+  const navigate = useNavigate();
 
   const apiButtonStyles =
     'absolute top-1/2 size-12 -translate-y-1/2 rounded-full bg-neutral-50 text-neutral-700 shadow-lg hover:bg-sky-100 hover:shadow-xl hover:shadow-sky-100';
@@ -26,8 +28,10 @@ export function RealtimeRanking({ data }) {
         >
           <CarouselContent className='gap-8 px-4'>
             {data?.map((item, _) => (
-              <div
+              <Link
                 className='p-1'
+                to='/products/$productId'
+                params={{ productId: item.id }} // 동적 세그먼트에 맞게 설정 추후 productId에 맞게 변경 필요
                 key={item.id}
               >
                 <Card className='overflow-hidden pt-0 transition-transform hover:-translate-y-1 hover:opacity-90 hover:shadow-lg'>
@@ -41,7 +45,7 @@ export function RealtimeRanking({ data }) {
                     </span>
                   </CardFooter>
                 </Card>
-              </div>
+              </Link>
             ))}
           </CarouselContent>
         </Carousel>
@@ -73,6 +77,12 @@ export function RealtimeRanking({ data }) {
       <Button
         variant='default'
         className='mx-auto mt-4 w-3xs px-8 hover:opacity-80'
+        onClick={() => {
+          navigate({
+            to: '/products',
+            search: (old) => ({ ...old, sort: 'popular' }),
+          });
+        }}
       >
         전체 인기 상품 보기
       </Button>
