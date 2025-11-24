@@ -1,40 +1,38 @@
 // import { logout } from '@/store/slices/authSlice';
 import { Icon } from '@iconify/react';
-import { Link, Navigate } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
+import { authApi } from '@/api/authApi';
 
 export default function TopBar() {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // const { isLoggedIn, user } = useSelector((state) => state.auth);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState({});
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [user, setUser] = useState({});
 
-  const handleLogout = () => {
-    // Dispatch logout action
-    // dispatch(logout());
-
-    setIsLoggedIn(false);
-    setUser({});
-    Navigate({ to: '/' });
-  };
-
-  const handleTestLogin = () => {
-    setIsLoggedIn(true);
-    setUser({ username: 'TestUser' });
+  const handleLogout = async () => {
+    try {
+      await authApi.logout();
+    } catch (err) {
+      console.warn('Logout API call failed:', err);
+    } finally {
+      dispatch(logout());
+      navigate({ to: '/' });
+    }
   };
 
   const menuItemStyle =
     'font-kakao-big text-md flex cursor-pointer items-center justify-center gap-1 text-center font-bold text-neutral-700 hover:text-blue-500 2xl:text-lg dark:text-neutral-300 dark:hover:text-blue-400';
 
-  useEffect(() => {});
-
   const menuItems = (itemStyle) => {
-    if (isLoggedIn) {
+    if (isAuthenticated) {
       return (
         <>
           <li aria-label='사용자 이름'>
@@ -42,7 +40,7 @@ export default function TopBar() {
               className={`${itemStyle} pt-1 2xl:pt-[0.125em]`}
               aria-label='사용자 이름 표시'
             >
-              {user.username || '사용자'}님
+              {user.userNickname || '사용자'}님
             </span>
           </li>
           <li aria-label='로그아웃'>
@@ -90,16 +88,9 @@ export default function TopBar() {
       return (
         <>
           <li aria-label='로그인'>
-            {/* <Link
-                  to='/login'
-                  className={itemStyle}
-                >
-                  로그인
-                </Link> */}
-            <span
-              onClick={handleTestLogin}
+            <Link
+              to='/login'
               className={itemStyle}
-              aria-label='로그인 버튼'
             >
               {/* <span className='icon-[line-md--login] w-8 h-8 mt-1'></span> */}
               <Icon
@@ -107,7 +98,18 @@ export default function TopBar() {
                 className='h-8 w-8'
               />
               로그인
-            </span>
+            </Link>
+            {/* <span
+              onClick={handleTestLogin}
+              className={itemStyle}
+              aria-label='로그인 버튼'
+            >
+              <Icon
+                icon='mdi:login'
+                className='h-8 w-8'
+              />
+              로그인
+            </span> */}
           </li>
           <li aria-label='회원가입'>
             <Link
