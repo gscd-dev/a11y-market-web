@@ -5,10 +5,10 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu';
+import { store } from '@/store/store';
 
 export const Route = createFileRoute('/_needAuth/_mypage/mypage')({
   component: RouteComponent,
-  //beforeLoad: () => {} // 사용자 하위페이지 접근 검증
 });
 
 function RouteComponent() {
@@ -19,7 +19,10 @@ function RouteComponent() {
   /*
     { label: '메뉴명', path: '/mypage/파일명' },
   */
-  const menuItems = [{ label: '배송지 관리', path: '/mypage/address' }];
+  const menuItems = [
+    { label: '회원 정보', path: '/mypage' },
+    { label: '배송지 관리', path: '/mypage/address' },
+  ];
 
   // 내비게이션 경로 표시 상단바
   const navPathLabel = () => {
@@ -71,7 +74,7 @@ function RouteComponent() {
 
       {/* Page Content */}
       <main
-        className='font-kakao-big flex flex-1 flex-col pt-20'
+        className='font-kakao-big flex flex-1 flex-col'
         aria-label='마이페이지 내용 영역'
       >
         {/* Top NavPathLabel bar */}
