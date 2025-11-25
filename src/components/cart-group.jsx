@@ -45,10 +45,14 @@ export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
 
   const handleDelete = (index) => {
     const newData = [...data];
-    newData.splice(index, 1);
+    const removedItems = newData.splice(index, 1);
     setData(newData);
 
-    axiosInstance.delete(`/v1/cart/items/${data[index].cartItemId}`);
+    axiosInstance.delete(`/v1/cart/items`, {
+      data: {
+        itemIds: removedItems.map((item) => item.cartItemId),
+      },
+    });
   };
 
   useEffect(() => {
