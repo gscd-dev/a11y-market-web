@@ -3,7 +3,7 @@ import { useSearch } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 
-export const Route = createFileRoute('/order/complete')({
+export const Route = createFileRoute('/_needAuth/order/complete')({
   component: OrderCompletePage,
 });
 

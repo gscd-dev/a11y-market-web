@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { getCheckoutInfo, createOrder } from '@/api/orderAPI';
 import { Button } from '@/components/ui/button';
 
-export const Route = createFileRoute('/order/checkout')({
+export const Route = createFileRoute('/_needAuth/order/checkout')({
   component: orderCheckoutPage,
 });
 
