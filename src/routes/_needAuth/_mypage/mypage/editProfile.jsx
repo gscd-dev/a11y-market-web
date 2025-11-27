@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
 import {
   Table,
@@ -8,32 +8,67 @@ import {
 } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { userApi } from '@/api/userApi';
+import { setProfile } from '@/store/userSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 export const Route = createFileRoute('/_needAuth/_mypage/mypage/editProfile')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  
-  const initialData = {
-    userName: '홍길동',
-    userEmail: 'hong@example.com',
-    userPhone: '010-1234-5678',
-    userNickname: '길동이',
-  };
 
-  const [form, setForm] = useState(initialData);
+  const dispatch = useDispatch();
+  const profile = useSelector((state) => state.user.profile);
+  
+  const [form, setForm] = useState({
+    userName: '',
+    userEmail: '',
+    userPhone: '',
+    userNickname: '',
+  });
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const resp = await userApi.getProfile();
+        dispatch(setProfile(resp.data));
+
+        setForm({
+          userName: resp.data.userName || '',
+          userEmail: resp.data.userEmail || '',
+          userPhone: resp.data.userPhone || '',
+          userNickname: resp.data.userNickname || '',
+        });
+      } catch (err) {
+        alert('회원정보를 불러오는데 실패했습니다.');
+      }
+    }
+    fetchProfile();
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSave = () => {
-    alert('변경사항이 저장되었습니다');
+  const handleSave = async () => {
+    try {
+      const resp = await userApi.updateProfile(form);
+
+      dispatch(setProfile(resp.data));
+      alert('변경사항이 저장되었습니다');
+    } catch (err) {
+      alert('회원정보 수정에 실패했습니다');
+    }
   };
 
   const handleCancel = () => {
-    setForm(initialData);
+    setForm({
+      userName: profile?.userName || '',
+      userEmail: profile?.userEmail || '',
+      userPhone: profile?.userPhone || '',
+      userNickname: profile?.userNickname || ''
+    });
     alert('변경사항이 취소되었습니다');
   };
 
