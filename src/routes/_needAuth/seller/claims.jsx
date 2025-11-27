@@ -13,8 +13,9 @@ import { Badge } from '@/components/ui/badge';
 import {  Select,  SelectContent,  SelectItem,  SelectTrigger,  SelectValue,} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { SummaryCard } from '@/components/seller/summary-card';
-import {  Pagination,  PaginationContent,  PaginationItem,  PaginationLink, PaginationPrevious,  PaginationNext,} from '@/components/ui/pagination';
-
+import {  Pagination,  PaginationContent,  PaginationItem,  PaginationLink,  PaginationPrevious,  PaginationNext,} from '@/components/ui/pagination';
+import { ClaimTypeBadge } from '@/components/seller/claim-type-badge';
+import { ClaimStatusBadge } from '@/components/seller/claim-status-badge';
 // 임시 데이터(백엔드 연동 전 UI 확인용)
 const mockRequests = [
   {
@@ -265,7 +266,7 @@ function SellerClaimsPage() {
                       {r.id}
                     </TableCell>
                     <TableCell className='px-4 py-2 align-middle'>
-                      <TypeBadge type={r.type} />
+                      <ClaimTypeBadge type={r.type} />
                     </TableCell>
                     <TableCell className='px-4 py-2 align-middle text-[11px] md:text-xs'>
                       {r.orderNo}
@@ -280,7 +281,7 @@ function SellerClaimsPage() {
                       {r.date}
                     </TableCell>
                     <TableCell className='px-4 py-2 align-middle'>
-                      <StatusBadge status={r.status} />
+                      <ClaimStatusBadge status={r.status} />
                     </TableCell>
                     <TableCell className='px-4 py-2 text-right align-middle text-[11px] md:text-xs'>
                       {r.amount === 0 ? '₩0' : `₩${r.amount.toLocaleString('ko-KR')}`}
@@ -602,42 +603,6 @@ function SellerClaimsPage() {
         </div>
       </section>
     </div>
-  );
-}
-
-function TypeBadge({ type }) {
-  const map = {
-    취소: 'bg-amber-50 text-amber-700 border-amber-200',
-    반품: 'bg-rose-50 text-rose-700 border-rose-200',
-    교환: 'bg-indigo-50 text-indigo-700 border-indigo-200',
-  };
-  return (
-    <Badge
-      variant='outline'
-      className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-        map[type] ?? 'border-slate-200 bg-slate-50 text-slate-700'
-      }`}
-    >
-      {type}
-    </Badge>
-  );
-}
-
-function StatusBadge({ status }) {
-  const map = {
-    접수: 'bg-amber-50 text-amber-700 border-amber-200',
-    처리중: 'bg-sky-50 text-sky-700 border-sky-200',
-    완료: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-  };
-  return (
-    <Badge
-      variant='outline'
-      className={`rounded-full border px-2 py-0.5 text-[11px] font-medium ${
-        map[status] ?? 'border-slate-200 bg-slate-50 text-slate-700'
-      }`}
-    >
-      {status}
-    </Badge>
   );
 }
 
