@@ -7,48 +7,32 @@ import {
   TableBody,
   TableCell,
 } from '@/components/ui/table';
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useEffect } from 'react';
+import { adminApi } from '@/api/adminApi';
 
 export const Route = createFileRoute('/_needAuth/_admin/admin/users')({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const [users] = useState([
-    {
-      userId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      userName: '김철수',
-      userEmail: 'chulsoo@example.com',
-      userNickname: '철수짱',
-      userRole: '구매자',
-      createdAt: '2025-11-28T04:27:41.611Z',
-      updatedAt: '2025-11-28T04:27:41.612Z',
-    },
-    {
-      userId: '52977ab3-d12a-4aa3-93bd-421bbfd1ff90',
-      userName: '이영희',
-      userEmail: 'younghee@example.com',
-      userNickname: '영희',
-      userRole: '판매자',
-      createdAt: '2025-11-20T02:15:10.000Z',
-      updatedAt: '2025-11-25T09:11:00.000Z',
-    },
-    {
-      userId: '92153bbb-a111-4b22-8f60-f86b7e91ccaa',
-      userName: '홍길동',
-      userEmail: 'hong@example.com',
-      userNickname: '길동',
-      userRole: '구매자',
-      createdAt: '2025-10-12T08:00:00.000Z',
-      updatedAt: '2025-11-01T13:11:22.000Z',
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [expandedRows, setExpandedRows] = useState([]);
 
   const toggleRow = (id) => {
     setExpandedRows((prev) => (prev.includes(id) ? prev.filter((r) => r !== id) : [...prev, id]));
   };
+
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        const response = await adminApi.getUsers();
+        setUsers(response.data);
+      } catch (err) {
+        console.error('회원 목록 정보를 불러오기데 실패했습니다.', err);
+      }
+    }
+    fetchUsers();
+  }, []);
 
   return (
     <>
