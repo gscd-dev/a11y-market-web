@@ -39,77 +39,78 @@ const MOCK_PRODUCTS = [
   },
 ];
 
-/** 상품 한 줄(row) 표시용 컴포넌트 */
-function SellerProductRow({ product }) {
-  const formattedPrice = new Intl.NumberFormat('ko-KR').format(product.price);
-
-  const statusLabelMap = {
-    ACTIVE: '판매 중',
-    PENDING: '승인 대기',
-    SOLD_OUT: '품절',
-    DELETED: '삭제됨',
-  };
-
-  const status = product.status || 'ACTIVE';
-  const statusLabel = statusLabelMap[status] || status;
-  const isSoldOut = status === 'SOLD_OUT' || product.stock === 0;
-
-  return (
-    <div className='grid grid-cols-12 items-center px-4 py-3 text-sm'>
-      <div className='col-span-5 truncate'>
-        <div className='font-medium'>
-          {product.name}
-          {isSoldOut && <span className='ml-2 text-xs text-red-500'>(품절)</span>}
-        </div>
-
-        {product.categoryName && (
-          <div className='text-muted-foreground text-xs'>{product.categoryName}</div>
-        )}
-
-        {product.createdAt && (
-          <div className='text-muted-foreground text-xs'>등록일: {product.createdAt}</div>
-        )}
-      </div>
-
-      <div className='col-span-2 text-right tabular-nums'>{formattedPrice}원</div>
-
-      <div className='col-span-1 text-center tabular-nums'>{product.stock}</div>
-
-      <div className='col-span-2 text-center'>
-        <Badge variant='outline'>{statusLabel}</Badge>
-      </div>
-
-      <div className='col-span-2 flex justify-end gap-2'>
-        <Button
-          asChild
-          variant='outline'
-          size='sm'
-        >
-          <Link
-            to='/seller/products/$productId/edit'
-            params={{ productId: product.id }}
-          >
-            수정
-          </Link>
-        </Button>
-
-        <Button
-          variant='outline'
-          size='sm'
-          disabled
-        >
-          삭제
-        </Button>
-      </div>
-    </div>
-  );
-}
-
 function SellerProductListPage() {
   const products = MOCK_PRODUCTS;
 
   const totalCount = products.length;
   const activeCount = products.filter((p) => p.status === 'ACTIVE').length;
+
+  /** 상품 한 줄(row) 표시용 컴포넌트 */
+  function sellerProductRow({ product }) {
+    const formattedPrice = new Intl.NumberFormat('ko-KR').format(product.price);
+
+    const statusLabelMap = {
+      ACTIVE: '판매 중',
+      PENDING: '승인 대기',
+      SOLD_OUT: '품절',
+      DELETED: '삭제됨',
+    };
+
+    const status = product.status || 'ACTIVE';
+    const statusLabel = statusLabelMap[status] || status;
+    const isSoldOut = status === 'SOLD_OUT' || product.stock === 0;
+
+    return (
+      <div className='grid grid-cols-12 items-center px-4 py-3 text-sm'>
+        <div className='col-span-5 truncate'>
+          <div className='font-medium'>{product.name}</div>
+
+          {product.categoryName && (
+            <div className='text-muted-foreground text-xs'>{product.categoryName}</div>
+          )}
+
+          {product.createdAt && (
+            <div className='text-muted-foreground text-xs'>등록일: {product.createdAt}</div>
+          )}
+        </div>
+
+        <div className='col-span-2 text-right tabular-nums'>{formattedPrice}원</div>
+
+        <div className='col-span-1 text-center tabular-nums'>{product.stock}</div>
+
+        <div className='col-span-2 text-center'>
+          {isSoldOut ? (
+            <Badge variant='destructive'>품절</Badge>
+          ) : (
+            <Badge variant='outline'>{statusLabel}</Badge>
+          )}
+        </div>
+
+        <div className='col-span-2 flex justify-end gap-2'>
+          <Button
+            asChild
+            variant='outline'
+            size='sm'
+          >
+            <Link
+              to='/seller/products/$productId/edit'
+              params={{ productId: product.id }}
+            >
+              수정
+            </Link>
+          </Button>
+
+          <Button
+            variant='outline'
+            size='sm'
+            disabled
+          >
+            삭제
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className='font-kakao-big-sans mx-auto max-w-5xl px-4 py-8'>
@@ -179,14 +180,7 @@ function SellerProductListPage() {
         )}
 
         {products.length > 0 && (
-          <div className='divide-y'>
-            {products.map((product) => (
-              <SellerProductRow
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
+          <div className='divide-y'>{products.map((product) => sellerProductRow({ product }))}</div>
         )}
       </section>
     </main>
