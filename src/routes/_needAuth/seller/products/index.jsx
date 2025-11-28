@@ -5,11 +5,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 
 /** /seller/products : 판매자의 "내 상품 목록" 페이지 */
-export const Route = createFileRoute('/seller/products/')({
+export const Route = createFileRoute('/_needAuth/seller/products/')({
   component: SellerProductListPage,
 });
 
-/** API 연동 전까지 사용할 더미 데이터 (나중에 교체) */
+/** API 연동 전까지 사용할 목 데이터 */
 const MOCK_PRODUCTS = [
   {
     id: 'P-001',
@@ -40,95 +40,7 @@ const MOCK_PRODUCTS = [
   },
 ];
 
-function SellerProductListPage() {
-  const products = MOCK_PRODUCTS;
-
-  const totalCount = products.length;
-  const activeCount = products.filter((p) => p.status === 'ACTIVE').length;
-
-  return (
-    <main className='font-kakao-big-sans mx-auto max-w-5xl px-4 py-8'>
-      <section className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-        <div>
-          <h1 className='text-2xl font-bold'>내 상품 목록</h1>
-          <p className='text-muted-foreground mt-1 text-sm'>
-            현재 판매 중인 상품을 확인하고 관리할 수 있습니다.
-          </p>
-        </div>
-        <Button asChild>
-          <Link to='/seller/products/new'>상품 등록하기</Link>
-        </Button>
-      </section>
-
-      {/* 요약 카드 */}
-      <section className='mb-6 grid gap-4 sm:grid-cols-3'>
-        <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-muted-foreground text-xs font-medium'>
-              등록된 상품 수
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{totalCount}개</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-muted-foreground text-xs font-medium'>판매 중</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{activeCount}개</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className='pb-2'>
-            <CardTitle className='text-muted-foreground text-xs font-medium'>품절/비활성</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='text-2xl font-bold'>{totalCount - activeCount}개</div>
-          </CardContent>
-        </Card>
-      </section>
-
-      {/* 목록 테이블 */}
-      <section className='bg-card rounded-xl border'>
-        <div className='text-muted-foreground grid grid-cols-12 border-b px-4 py-3 text-xs font-medium'>
-          <div className='col-span-5'>상품명</div>
-          <div className='col-span-2 text-right'>판매가</div>
-          <div className='col-span-1 text-center'>재고</div>
-          <div className='col-span-2 text-center'>상태</div>
-          <div className='col-span-2 text-right'>관리</div>
-        </div>
-
-        {products.length === 0 && (
-          <div className='text-muted-foreground px-4 py-10 text-center text-sm'>
-            아직 등록한 상품이 없습니다.{' '}
-            <Link
-              to='/seller/products/new'
-              className='font-semibold underline'
-            >
-              첫 상품을 등록해보세요.
-            </Link>
-          </div>
-        )}
-
-        {products.length > 0 && (
-          <div className='divide-y'>
-            {products.map((product) => (
-              <SellerProductRow
-                key={product.id}
-                product={product}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-    </main>
-  );
-}
-
+/** 상품 한 줄(row) 표시용 컴포넌트 */
 function SellerProductRow({ product }) {
   const formattedPrice = new Intl.NumberFormat('ko-KR').format(product.price);
 
@@ -168,7 +80,6 @@ function SellerProductRow({ product }) {
         <Badge variant='outline'>{statusLabel}</Badge>
       </div>
 
-      {/* 수정/삭제는 나중에 API 연동 시 활성화 */}
       <div className='col-span-2 flex justify-end gap-2'>
         <Button
           variant='outline'
@@ -186,5 +97,93 @@ function SellerProductRow({ product }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+function SellerProductListPage() {
+  const products = MOCK_PRODUCTS;
+
+  const totalCount = products.length;
+  const activeCount = products.filter((p) => p.status === 'ACTIVE').length;
+
+  return (
+    <main className='font-kakao-big-sans mx-auto max-w-5xl px-4 py-8'>
+      <section className='mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+        <div>
+          <h1 className='text-2xl font-bold'>내 상품 목록</h1>
+          <p className='text-muted-foreground mt-1 text-sm'>
+            현재 판매 중인 상품을 확인하고 관리할 수 있습니다.
+          </p>
+        </div>
+
+        <Button asChild>
+          <Link to='/seller/products/new'>상품 등록하기</Link>
+        </Button>
+      </section>
+
+      <section className='mb-6 grid gap-4 sm:grid-cols-3'>
+        <Card>
+          <CardHeader className='pb-2'>
+            <CardTitle className='text-muted-foreground text-xs font-medium'>
+              등록된 상품 수
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{totalCount}개</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className='pb-2'>
+            <CardTitle className='text-muted-foreground text-xs font-medium'>판매 중</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{activeCount}개</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className='pb-2'>
+            <CardTitle className='text-muted-foreground text-xs font-medium'>품절/비활성</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className='text-2xl font-bold'>{totalCount - activeCount}개</div>
+          </CardContent>
+        </Card>
+      </section>
+
+      <section className='bg-card rounded-xl border'>
+        <div className='text-muted-foreground grid grid-cols-12 border-b px-4 py-3 text-xs font-medium'>
+          <div className='col-span-5'>상품명</div>
+          <div className='col-span-2 text-right'>판매가</div>
+          <div className='col-span-1 text-center'>재고</div>
+          <div className='col-span-2 text-center'>상태</div>
+          <div className='col-span-2 text-right'>관리</div>
+        </div>
+
+        {products.length === 0 && (
+          <div className='text-muted-foreground px-4 py-10 text-center text-sm'>
+            아직 등록한 상품이 없습니다.{' '}
+            <Link
+              to='/seller/products/new'
+              className='font-semibold underline'
+            >
+              첫 상품을 등록해보세요.
+            </Link>
+          </div>
+        )}
+
+        {products.length > 0 && (
+          <div className='divide-y'>
+            {products.map((product) => (
+              <SellerProductRow
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }
