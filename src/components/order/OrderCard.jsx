@@ -4,21 +4,24 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
-import OrderStatusBadge from './OrderStatusBadge';
+import CancelModal from './CancelModal';
+import { cancelOrder } from '@/api/orderApi';
 
 export default function OrderCard({ order }) {
   const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   const formatPhone = (phone) => {
     if (!phone) return '정보 없음';
     return phone.replace(/[^0-9]/g, '').replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
   };
 
+  console.log('OrderCard order:', order);
+  console.log('OrderCard items:', order.orderItems);
+
   return (
-    <Card>
-      <CardHeader className='flex justify-end'>
-        <OrderStatusBadge status={order?.orderStatus} />
-      </CardHeader>
+    <Card className="border-none shadow-none bg-transparent">
 
       <CardContent className='space-y-2'>
         {order.orderItems?.map((item) => (
@@ -33,7 +36,7 @@ export default function OrderCard({ order }) {
                 params={{ productId: item.productId }}
               >
                 <img
-                  src={item.imageUrl || '/no-image.png'}
+                  src={item.productImageUrl || '/no-image.png'}
                   alt={item.productName}
                   className='h-24 w-24 cursor-pointer object-cover'
                 />
@@ -49,15 +52,21 @@ export default function OrderCard({ order }) {
                 <p className='text-gray-600'>
                   총액: {(item.productPrice * item.productQuantity).toLocaleString()}원
                 </p>
-                <p>
-                  {' '}
-                  {/* 상품별 상태 : 개발 중 */}
-                  상태: <OrderStatusBadge status={order?.orderStatus || 'PENDING'} />
-                </p>
+                <p>상태: {item.orderItemStatus}</p>
               </div>
             </div>
 
-            <Button variant='outline'>상품 상세</Button>
+            {['결제완료', '주문완료'].includes(item.orderItemStatus) && (
+              <Button
+                variant='default'
+                onClick={() => {
+                  setSelectedItem(item);
+                  setIsOpen(true);
+                }}
+              >
+                주문 취소
+              </Button>
+            )}
           </div>
         ))}
       </CardContent>
@@ -81,6 +90,27 @@ export default function OrderCard({ order }) {
             <p>결제수단: {order.paymentMethod || '카드'}</p>
             <p>주문일시: {order.createdAt}</p>
           </div>
+        )}
+
+        {selectedItem && (
+          <CancelModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            item={selectedItem}
+            onSubmit={async (reason) => {
+              try {
+                await cancelOrder(order.orderId, {
+                  orderItemId: selectedItem.orderItemId,
+                  reason: reason,
+                });
+                alert('취소 요청이 접수되었습니다.');
+                window.location.reload();
+                setIsOpen(false);
+              } catch {
+                alert('취소 요청 실패');
+              }
+            }}
+          />
         )}
       </CardFooter>
     </Card>
