@@ -17,9 +17,6 @@ export default function OrderCard({ order }) {
     return phone.replace(/[^0-9]/g, '').replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
   };
 
-  console.log('OrderCard order:', order);
-  console.log('OrderCard items:', order.orderItems);
-
   return (
     <Card className="border-none shadow-none bg-transparent">
 
