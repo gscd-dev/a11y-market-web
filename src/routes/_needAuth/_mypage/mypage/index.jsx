@@ -21,6 +21,7 @@ import {
   ItemMedia,
   ItemTitle,
 } from '@/components/ui/item';
+import { getOrderItemStatusLabel } from '@/lib/orderStatusMapping';
 
 export const Route = createFileRoute('/_needAuth/_mypage/mypage/')({
   component: RouteComponent,
@@ -197,7 +198,7 @@ function RouteComponent() {
                             <div className='flex flex-1 flex-col justify-center'>
                               <p className='text-md'>{`가격: ${item.productPrice?.toLocaleString()}원 | 수량: ${item.productQuantity}`}</p>
                               <p className='text-md'>{`총액: ${item.productTotalPrice?.toLocaleString()}원`}</p>
-                              <p className='text-md'>{`상태: ${item.orderItemStatus}`}</p>
+                              <p className='text-md'>{`상태: ${getOrderItemStatusLabel(item.orderItemStatus)}`}</p>
                             </div>
                           </ItemContent>
                           <ItemActions>
