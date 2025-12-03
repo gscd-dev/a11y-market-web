@@ -9,8 +9,8 @@ import { getA11yProfiles, deleteA11yProfile } from '@/api/a11yApi';
 import { setAllA11y } from '@/store/a11ySlice';
 
 import { Card, CardContent } from '@/components/ui/card';
-import A11yProfileList from '@/components/a11y/A11yProfileList';
-import A11yEditModal from '@/components/a11y/A11yEditModal';
+import A11yProfileList from '@/components/accessibility/A11yProfileList';
+import A11yEditModal from '@/components/accessibility/A11yEditModal';
 
 export const Route = createFileRoute('/_needAuth/_mypage/mypage/a11y/')({
   component: A11ySettingsPage,
