@@ -164,7 +164,7 @@ function RouteComponent() {
               </TabsList>
               {user?.userRole === ROLES.USER && (
                 <Button
-                  onClick={() => navigate('/seller-application')}
+                  onClick={() => navigate('/seller/apply')}
                   className='group w-full gap-2 shadow-md transition-all duration-400 hover:text-base md:h-12'
                   variant='outline'
                 >
@@ -174,15 +174,7 @@ function RouteComponent() {
               )}
               {user?.userRole === ROLES.SELLER && (
                 <Button
-                  onClick={() =>
-                    toast('판매자 센터는 곧 오픈됩니다!', {
-                      description: '기대해주세요!',
-                      action: {
-                        label: '닫기',
-                        onClick: () => toast.dismiss(),
-                      },
-                    })
-                  }
+                  onClick={() => navigate('/seller')}
                   className='group w-full gap-2 shadow-md transition-all duration-400 hover:text-base md:h-12'
                   variant='outline'
                 >

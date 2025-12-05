@@ -1,3 +1,4 @@
+import { ErrorEmpty } from '@/components/main/error-empty';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/_error/unauthorized')({
@@ -5,5 +6,10 @@ export const Route = createFileRoute('/_error/unauthorized')({
 });
 
 function RouteComponent() {
-  return <div>Hello "/_error/unauthorized"!</div>;
+  return (
+    <ErrorEmpty
+      prevPath='/'
+      message='접근 권한이 없습니다.'
+    />
+  );
 }
