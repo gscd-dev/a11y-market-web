@@ -1,9 +1,9 @@
 import { sellerApi } from '@/api/seller-api';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 
 /** 요약 정보 목데이터 (나중에 API 연동) */
 const MOCK_DASHBOARD = {

@@ -1,11 +1,11 @@
 import { sellerApi } from '@/api/seller-api';
+import { DashboardCard } from '@/components/seller/dashboard/dashbord-card';
+import { Button } from '@/components/ui/button';
+import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Link } from '@tanstack/react-router';
 import { ClipboardList } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { Button } from '../ui/button';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '../ui/item';
-import { DashboardCard } from './dashbord-card';
 
 export const DashboardStatSection = () => {
   const { user } = useSelector((state) => state.auth);

@@ -1,7 +1,7 @@
 import { sellerApi } from '@/api/seller-api';
+import { Badge } from '@/components/ui/badge';
 import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { Badge } from '../ui/badge';
 
 /** 판매 상위 상품 목데이터 */
 const MOCK_TOP_PRODUCTS = [

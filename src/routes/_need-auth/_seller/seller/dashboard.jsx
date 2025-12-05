@@ -1,7 +1,7 @@
-import { DashboardDailyRevenue } from '@/components/seller/dashboard-daily-revenue';
-import { DashboardRecentOrder } from '@/components/seller/dashboard-recent-order';
-import { DashboardStatSection } from '@/components/seller/dashboard-stat-section';
-import { DashboardTopProduct } from '@/components/seller/dashboard-top-product';
+import { DashboardDailyRevenue } from '@/components/seller/dashboard/daily-revenue';
+import { DashboardRecentOrder } from '@/components/seller/dashboard/recent-order';
+import { DashboardStatSection } from '@/components/seller/dashboard/stat-section';
+import { DashboardTopProduct } from '@/components/seller/dashboard/top-product';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { createFileRoute, Link } from '@tanstack/react-router';

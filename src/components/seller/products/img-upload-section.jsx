@@ -1,10 +1,11 @@
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Field } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Star, Upload, X } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card, CardContent } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
 
-export function ImageUploadSection({ images, onImagesChange, sectionType }) {
+export function ImageUploadSection({ images, onImagesChange, sectionType, disabled }) {
   const handleFileSelect = (e) => {
     const files = Array.from(e.target.files);
     const startSequence = sectionType === 'product' ? 0 : 10;
@@ -57,7 +58,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
 
   return (
     <div className='space-y-4'>
-      <div>
+      <Field className='gap-0'>
         <Label
           htmlFor={inputId}
           className='mb-2 block'
@@ -77,6 +78,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
             onClick={() => document.getElementById(inputId).click()}
             className='w-full'
             aria-label={`${sectionType === 'product' ? '상품' : '상세 정보'} 사진 추가`}
+            disabled={disabled}
           >
             <Upload className='mr-2 h-4 w-4' />
             사진 업로드
@@ -91,6 +93,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
           onChange={handleFileSelect}
           className='sr-only'
           aria-describedby={`${sectionId}-description`}
+          disabled={disabled}
         />
 
         <p
@@ -101,7 +104,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
             ? '대표 사진을 포함하여 최대 10개의 상품 사진을 업로드할 수 있습니다. 첫 번째 사진이 대표 사진으로 설정됩니다.'
             : '상품의 상세 정보를 설명하는 사진을 업로드하세요. 개수 제한이 없습니다.'}
         </p>
-      </div>
+      </Field>
 
       {sectionImages.length > 0 && (
         <div
@@ -144,6 +147,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
                       className='absolute top-2 right-2'
                       onClick={() => handleRemoveImage(image.sequence)}
                       aria-label={`사진 ${image.sequence + 1} 삭제`}
+                      disabled={disabled}
                     >
                       <X className='h-4 w-4' />
                     </Button>
@@ -166,6 +170,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
                         className='mt-1'
                         aria-required='true'
                         aria-label={`사진 ${image.sequence + 1}의 대체 텍스트`}
+                        disabled={disabled}
                       />
                     </div>
 
@@ -182,6 +187,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType }) {
                         onClick={() => handleSetMainImage(image.sequence)}
                         className='w-full'
                         aria-label={`사진 ${image.sequence + 1}을 대표 사진으로 설정`}
+                        disabled={disabled}
                       >
                         <Star className='mr-1 h-3 w-3' />
                         대표 사진으로 설정
