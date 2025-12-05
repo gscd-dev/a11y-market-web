@@ -1,6 +1,6 @@
 import { CategoryView } from '@/components/main/category-view';
 import { MainCarousel } from '@/components/main/main-carousel';
-import { RealtimeRanking } from '@/components/main/realtime-ranking';
+import { PopularRanking } from '@/components/main/popular-ranking';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Icon } from '@iconify/react';
 import { createFileRoute } from '@tanstack/react-router';
@@ -17,14 +17,6 @@ function HomePage() {
     { id: 3, productName: '혜택 배너 3', description: '세 번째 혜택 배너 설명' },
     { id: 4, productName: '혜택 배너 4', description: '네 번째 혜택 배너 설명' },
     { id: 5, productName: '혜택 배너 5', description: '다섯 번째 혜택 배너 설명' },
-  ];
-
-  const categoriesDummyData = [
-    { id: 1, name: '카테고리 1' },
-    { id: 2, name: '카테고리 2' },
-    { id: 3, name: '카테고리 3' },
-    { id: 4, name: '카테고리 4' },
-    { id: 5, name: '카테고리 5' },
   ];
 
   const productsDummyData = [
@@ -52,28 +44,11 @@ function HomePage() {
 
   const [productList, setProductList] = useState(productsDummyData.slice(0, 12));
 
-  const handleSelectCategory = (categoryId) => {
-    const filteredProducts = productsDummyData.filter(
-      (product) => product.categoryId === categoryId,
-    );
-    setProductList(filteredProducts);
-  };
-
   return (
     <main className='font-kakao-big flex min-h-screen w-full flex-col items-center'>
-      <section className='flex h-fit w-full items-center justify-center bg-amber-50 px-4 pb-8 lg:py-8 dark:bg-stone-700'>
-        <MainCarousel data={bannerData} />
-      </section>
-      <section className='flex h-fit w-full flex-col items-center justify-center'>
-        <RealtimeRanking />
-      </section>
-      <section className='flex h-fit w-full flex-col items-center justify-center'>
-        <CategoryView
-          categories={categoriesDummyData}
-          products={productList}
-          onSelectCategory={handleSelectCategory}
-        />
-      </section>
+      <MainCarousel data={bannerData} />
+      <PopularRanking />
+      <CategoryView products={productList} />
       <section className='mt-16 flex w-full flex-col items-center justify-center bg-neutral-100 dark:bg-neutral-700'>
         <div className='flex w-full max-w-7xl flex-col items-center justify-center px-4 py-16 text-center'>
           <h2 className='w-full text-4xl font-bold'>왜 A11yMARKET 일까요?</h2>
