@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/table';
 import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
   const [data, setData] = useState(groupData.items);
@@ -58,7 +59,12 @@ export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
     const newData = [...data];
     const removedItems = newData.splice(index, 1);
     setData(newData);
-    await cartApi.deleteCartItems(removedItems);
+    try {
+      await cartApi.deleteCartItems(removedItems.map((item) => item.cartItemId));
+    } catch (error) {
+      console.error('Failed to delete cart items:', error);
+      toast.error('장바구니 아이템 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
   };
 
   useEffect(() => {
@@ -89,7 +95,7 @@ export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
               colSpan={5}
               className='w-[95%] text-2xl font-bold'
             >
-              {data[0].sellerName}
+              {data[0]?.sellerName}
             </TableHead>
           </TableRow>
           <TableRow>

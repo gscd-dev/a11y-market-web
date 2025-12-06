@@ -1,16 +1,32 @@
+import { cartApi } from '@/api/cart-api';
 import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Link } from '@tanstack/react-router';
 import { ShoppingCart } from 'lucide-react';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 export const ProductCard = ({ product }) => {
+  const [loading, setLoading] = useState(false);
+
   const formattedPrice = product.productPrice.toLocaleString('ko-KR');
 
-  const handleAddToCart = (event) => {
+  const handleAddToCart = async (event) => {
     event.preventDefault();
-    // Implement add to cart functionality here
-    alert('장바구니에 담겼습니다!');
+    setLoading(true);
+
+    try {
+      const resp = await cartApi.addCartItem(product.productId, 1);
+      if (resp.status === 201) {
+        toast.success(`${product.productName}이(가) 장바구니에 추가되었습니다.`);
+      }
+    } catch (error) {
+      toast.error('장바구니에 추가하는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -21,16 +37,18 @@ export const ProductCard = ({ product }) => {
       <Link to={`/products/${product.productId}`}>
         <div className='relative aspect-square overflow-hidden rounded-t-lg'>
           <ImageWithFallback
-            src={product.productImageUrl}
+            src={product.productImageUrl || product.productImages[0]?.imageUrl}
             alt={product.productName}
             className='size-full object-cover transition-transform duration-300 group-hover:scale-105'
           />
-          <Badge
-            className='absolute top-2 left-2 bg-red-500 text-white'
-            aria-label={`인기 순위 ${product.ranking}`}
-          >
-            {product.ranking}위
-          </Badge>
+          {product.ranking && (
+            <Badge
+              className='absolute top-2 left-2 bg-red-500 text-white'
+              aria-label={`인기 순위 ${product.ranking}`}
+            >
+              {product.ranking}위
+            </Badge>
+          )}
         </div>
 
         <div className='p-4'>
@@ -54,7 +72,7 @@ export const ProductCard = ({ product }) => {
               className='size-4'
               aria-hidden='true'
             />
-            장바구니
+            {loading ? <Spinner /> : '장바구니'}
           </Button>
         </div>
       </Link>
