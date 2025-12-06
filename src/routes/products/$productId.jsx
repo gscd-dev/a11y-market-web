@@ -4,6 +4,7 @@ import { ImageWithFallback } from '@/components/image-with-fallback';
 import { LoadingEmpty } from '@/components/main/loading-empty';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Item } from '@/components/ui/item';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { RotateCcw, Shield, ShoppingCart, Store, Truck } from 'lucide-react';
@@ -42,7 +43,6 @@ function ProductDetailPage() {
       try {
         const response = await productApi.getProductDetails(productId);
         setProductData(response.data);
-        console.log('Fetched productData details:', response.data);
       } catch (error) {
         console.error('Failed to fetch productData details:', error);
         navigate({
@@ -206,9 +206,37 @@ function ProductDetailPage() {
               value='details'
               className='py-6'
             >
-              <h3 className='mb-4 text-xl'>상품 상세 정보</h3>
+              <h3 className='mb-4 text-xl font-bold'>상품 상세 정보</h3>
               <div className='prose max-w-none'>
                 <p>{productData.productDescription}</p>
+                {productData.summaryText && (
+                  // 상품 요약 정보가 있으면, 상품 요약 정보, 사용처, 사용방법을 Item 컴포넌트로 감싸기
+                  <Item
+                    variant='outline'
+                    className='my-8 flex-col items-start'
+                    tabIndex={0}
+                    role='region'
+                    aria-label='상품 요약 정보'
+                  >
+                    {/* 전체를 감싸는 설명 목록 (dl) */}
+                    <dl className='w-full space-y-4'>
+                      <div className='space-y-1'>
+                        <dt className='text-lg font-semibold'>상품 요약 설명: </dt>
+                        <dd className='text-muted-foreground'>{productData.summaryText}</dd>
+                      </div>
+
+                      <div className='space-y-1'>
+                        <dt className='text-lg font-semibold'>사용처: </dt>
+                        <dd className='text-muted-foreground'>{productData.usageContext}</dd>
+                      </div>
+
+                      <div className='space-y-1'>
+                        <dt className='text-lg font-semibold'>사용방법: </dt>
+                        <dd className='text-muted-foreground'>{productData.usageMethod}</dd>
+                      </div>
+                    </dl>
+                  </Item>
+                )}
                 {/* 이미지 상세 정보가 있으면 gap 없이 1번부터 세로 나열 */}
                 <div className='space-y-6'>
                   {productData.productImages.slice(1)?.map((image) => (

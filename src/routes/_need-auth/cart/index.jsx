@@ -1,6 +1,7 @@
 // src/routes/cart.jsx
 import { cartApi } from '@/api/cart-api';
 import { CartGroup } from '@/components/cart-group';
+import { LoadingEmpty } from '@/components/main/loading-empty';
 import { Alert, AlertTitle } from '@/components/ui/alert';
 import {
   Breadcrumb,
@@ -26,6 +27,7 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { AlertCircleIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_need-auth/cart/')({
   component: CartPage,
@@ -34,6 +36,7 @@ export const Route = createFileRoute('/_need-auth/cart/')({
 function CartPage() {
   const [cartGroups, setCartGroups] = useState([]);
   const [selectedItems, setSelectedItems] = useState(new Set());
+  const [fetching, setFetching] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [submitType, setSubmitType] = useState('none');
   const [err, setErr] = useState(null);
@@ -78,10 +81,22 @@ function CartPage() {
 
   useEffect(() => {
     const fetchCartData = async () => {
-      const resp = await cartApi.getCartItems();
+      setFetching(true);
+      try {
+        const resp = await cartApi.getCartItems();
 
-      setCartGroups(resp.data);
-      setTotalPrice(resp.data?.total || 0);
+        if (resp.status !== 200) {
+          throw new Error('Failed to fetch cart items');
+        }
+
+        setCartGroups(resp.data);
+        setTotalPrice(resp.data?.total || 0);
+      } catch (error) {
+        console.error('Failed to fetch cart items:', error);
+        toast.error('장바구니 정보를 불러오는 데 실패했습니다. 잠시 후 다시 시도해주세요.');
+      } finally {
+        setFetching(false);
+      }
     };
     fetchCartData();
   }, []);
@@ -103,6 +118,14 @@ function CartPage() {
     };
     calculateTotalPrice();
   }, [cartGroups, selectedItems]);
+
+  if (fetching) {
+    return (
+      <div className='flex h-fit flex-col items-center justify-center py-8'>
+        <LoadingEmpty />
+      </div>
+    );
+  }
 
   const getContent = () => {
     if (!cartGroups.items || cartGroups.items.length === 0) {
@@ -152,7 +175,7 @@ function CartPage() {
     } else {
       return (
         <>
-          <section className='flex py-8'>
+          <section className='flex flex-col gap-8 py-8'>
             {cartGroups.items.map((groupData) => (
               <CartGroup
                 key={groupData.sellerId}
