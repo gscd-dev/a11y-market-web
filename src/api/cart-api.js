@@ -5,17 +5,24 @@ export const cartApi = {
 
   getCartItemNumber: async () => await axiosInstance.get('/v1/cart/me/items/count'),
 
-  addCartItem: async (cartItemId, quantity) => {
-    const resp = await axiosInstance.patch(`/v1/cart/items/${cartItemId}`, {
+  addCartItem: async (productId, quantity) => {
+    const resp = await axiosInstance.post(`/v1/cart/items`, {
+      productId: productId,
       quantity: quantity,
     });
     return resp.data;
   },
 
+  updateCartItemQuantity: async (itemId, quantity) => {
+    await axiosInstance.patch(`/v1/cart/items/${itemId}`, {
+      quantity: quantity,
+    });
+  },
+
   deleteCartItems: async (itemIds) => {
     await axiosInstance.delete(`/v1/cart/items`, {
-      data: {
-        itemIds,
+      itemIds: {
+        itemIds: itemIds,
       },
     });
   },
