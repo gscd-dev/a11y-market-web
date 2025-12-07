@@ -15,6 +15,7 @@ import {
 import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
+import { ImageWithFallback } from './image-with-fallback';
 
 export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
   const [data, setData] = useState(groupData.items);
@@ -120,7 +121,7 @@ export const CartGroup = ({ groupData, selectedItems, setSelectedItems }) => {
                 />
               </TableCell>
               <TableCell className='w-[10%]'>
-                <img
+                <ImageWithFallback
                   src={item.productImageUrl}
                   alt={item.productName}
                   className='h-16 w-24 object-cover'
