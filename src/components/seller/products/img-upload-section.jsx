@@ -1,9 +1,11 @@
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Star, Upload, X } from 'lucide-react';
+import { useEffect } from 'react';
 
 export function ImageUploadSection({ images, onImagesChange, sectionType, disabled }) {
   const handleFileSelect = (e) => {
@@ -55,6 +57,10 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
 
   const sectionId = `${sectionType}-images`;
   const inputId = `${sectionType}-image-input`;
+
+  useEffect(() => {
+    console.log('Current images:', sectionImages);
+  }, [images]);
 
   return (
     <div className='space-y-4'>
@@ -120,8 +126,8 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
               <CardContent className='p-4'>
                 <div className='space-y-3'>
                   <div className='relative aspect-video overflow-hidden rounded-md bg-gray-100'>
-                    <img
-                      src={image.preview}
+                    <ImageWithFallback
+                      src={image.preview || image.imageUrl}
                       alt={
                         image.altText ||
                         `${sectionType === 'product' ? '상품' : '상세'} 사진 ${image.sequence + 1}`
@@ -159,7 +165,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
                         htmlFor={`alt-${image.sequence}`}
                         className='text-xs'
                       >
-                        대체 텍스트 (필수)
+                        {'대체 텍스트 (필수)'}
                       </Label>
                       <Input
                         id={`alt-${image.sequence}`}
