@@ -1,6 +1,4 @@
-import { categoryApi } from '@/api/category-api';
 import { sellerApi } from '@/api/seller-api';
-import { LoadingEmpty } from '@/components/main/loading-empty';
 import { ImageUploadSection } from '@/components/seller/products/img-upload-section';
 import {
   AlertDialog,
@@ -31,7 +29,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 import { createFileRoute } from '@tanstack/react-router';
 import { Archive, DollarSign, Image, Package } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
 
 export const Route = createFileRoute('/_need-auth/_seller/seller/products/new')({
@@ -56,51 +55,12 @@ function RouteComponent() {
     productStock: '',
   });
 
-  const [categories, setCategories] = useState([]);
+  const { categories } = useSelector((state) => state.category);
 
   const [images, setImages] = useState([]);
   const [errors, setErrors] = useState({});
-  const [selectedParentCategory, setSelectedParentCategory] = useState('');
-  const [subCategories, setSubCategories] = useState([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
-
-  useEffect(() => {
-    setIsLoadingCategories(true);
-    (async () => {
-      try {
-        const resp = await categoryApi.getCategories();
-        console.log('Categories Response:', resp.data);
-        setCategories(resp.data);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      } finally {
-        setIsLoadingCategories(false);
-      }
-    })();
-  }, []);
-
-  const handleParentCategoryChange = (value) => {
-    const parentId = value;
-    setSelectedParentCategory(parentId);
-
-    // 상위 카테고리가 선택되면 하위 카테고리 목록 업데이트
-    if (parentId) {
-      const selectedCategory = categories.find((cat) => cat.categoryId === parentId);
-      setSubCategories(selectedCategory?.subCategories || []);
-    } else {
-      setSubCategories([]);
-    }
-
-    // 하위 카테고리 선택 초기화
-    setFormData((prev) => ({ ...prev, categoryId: '' }));
-
-    // 에러 클리어
-    if (errors.categoryId) {
-      setErrors((prev) => ({ ...prev, categoryId: '' }));
-    }
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -141,7 +101,7 @@ function RouteComponent() {
     }
 
     // 대체 텍스트 검증
-    const imagesWithoutAlt = images.filter((img) => !img.altText.trim());
+    const imagesWithoutAlt = images.filter((img) => !img.altText.trim() && img.sequence < 10);
     if (imagesWithoutAlt.length > 0) {
       newErrors.imageAlt = '모든 사진에 대체 텍스트를 입력해주세요.';
     }
@@ -204,14 +164,6 @@ function RouteComponent() {
     }
   };
 
-  if (isLoadingCategories) {
-    return (
-      <main className='font-kakao-big mx-auto max-w-5xl px-4 py-10'>
-        <LoadingEmpty />
-      </main>
-    );
-  }
-
   return (
     <main className='font-kakao-big mx-auto max-w-5xl px-4 py-10'>
       <form
@@ -270,7 +222,7 @@ function RouteComponent() {
                 <FieldGroup className='gap-4'>
                   <Field className='gap-0'>
                     <FieldLabel htmlFor='parentCategoryId'>
-                      상위 카테고리
+                      카테고리
                       <span
                         className='text-red-500'
                         aria-label='필수'
@@ -279,91 +231,43 @@ function RouteComponent() {
                       </span>
                     </FieldLabel>
                     <Select
-                      value={selectedParentCategory}
-                      onValueChange={handleParentCategoryChange}
+                      value={formData.categoryId}
+                      onValueChange={(value) => {
+                        setFormData((prev) => ({ ...prev, categoryId: value }));
+                        // 에러 클리어
+                        if (errors.categoryId) {
+                          setErrors((prev) => ({ ...prev, categoryId: '' }));
+                        }
+                      }}
                     >
                       <SelectTrigger
-                        id='parentCategoryId'
-                        name='parentCategoryId'
                         aria-required='true'
-                        aria-describedby='category-description'
+                        aria-invalid={!!errors.categoryId}
+                        aria-describedby={
+                          errors.categoryId ? 'categoryId-error' : 'category-description'
+                        }
                         className='mt-1'
                         disabled={isSubmitting}
                       >
-                        <SelectValue placeholder='상위 카테고리를 선택하세요' />
+                        <SelectValue placeholder='카테고리 선택' />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>상위 카테고리</SelectLabel>
-                          {categories.map((category) => (
-                            <SelectItem
-                              key={category.categoryId}
-                              value={category.categoryId}
-                            >
-                              {category.categoryName}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  {subCategories.length > 0 && (
-                    <Field className='gap-0'>
-                      <FieldLabel htmlFor='parentCategoryId'>
-                        하위 카테고리
-                        <span
-                          className='text-red-500'
-                          aria-label='필수'
-                        >
-                          *
-                        </span>
-                      </FieldLabel>
-                      <Select
-                        value={formData.categoryId}
-                        onValueChange={(value) => {
-                          setFormData((prev) => ({ ...prev, categoryId: value }));
-                          // 에러 클리어
-                          if (errors.categoryId) {
-                            setErrors((prev) => ({ ...prev, categoryId: '' }));
-                          }
-                        }}
-                      >
-                        <SelectTrigger
-                          id='categoryId'
-                          name='categoryId'
-                          aria-required='true'
-                          aria-invalid={!!errors.categoryId}
-                          aria-describedby={
-                            errors.categoryId ? 'categoryId-error' : 'category-description'
-                          }
-                          className='mt-1'
-                          disabled={isSubmitting}
-                        >
-                          <SelectValue placeholder='하위 카테고리를 선택하세요' />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectGroup>
-                            <SelectLabel>하위 카테고리</SelectLabel>
-                            {subCategories.map((subCategory) => (
+                        {categories.map((category) => (
+                          <SelectGroup key={category.categoryId}>
+                            <SelectLabel>{category.categoryName}</SelectLabel>
+                            {category.subCategories.map((subCategory) => (
                               <SelectItem
-                                key={subCategory.categoryId}
                                 value={subCategory.categoryId}
+                                key={subCategory.categoryId}
                               >
                                 {subCategory.categoryName}
                               </SelectItem>
                             ))}
                           </SelectGroup>
-                        </SelectContent>
-                      </Select>
-                    </Field>
-                  )}
-
-                  <p
-                    id='category-description'
-                    className='text-xs text-gray-500'
-                  >
-                    상위 카테고리를 먼저 선택한 후 하위 카테고리를 선택해주세요.
-                  </p>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </Field>
 
                   {errors.categoryId && (
                     <p

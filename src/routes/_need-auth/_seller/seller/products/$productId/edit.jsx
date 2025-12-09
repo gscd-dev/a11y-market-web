@@ -1,462 +1,594 @@
 // src/routes/_needAuth/seller/products/$productId/edit.jsx
+import { productApi } from '@/api/product-api';
+import { sellerApi } from '@/api/seller-api';
+import { ImageUploadSection } from '@/components/seller/products/img-upload-section';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Field, FieldGroup } from '@/components/ui/field';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Item, ItemContent } from '@/components/ui/item';
 import { Label } from '@/components/ui/label';
-import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { AlertCircleIcon, Archive, DollarSign, Image, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 function SellerProductEditPage() {
+  // hooks
   const { productId } = Route.useParams();
+  const { categories } = useSelector((state) => state.category);
+  const navigate = useNavigate();
 
   // 실제로는 서버에서 불러와서 초기값 세팅
-  const [form, setForm] = useState({
-    name: '',
-    summary: '',
-    brand: '',
-    category: '',
-    price: '',
-    stock: '',
-    status: 'on', // on: 판매중, pause: 일시중지, hidden: 비공개 등
+  const [images, setImages] = useState([]);
+  const [formData, setFormData] = useState({
+    productName: '',
+    productDescription: '',
+    categoryId: '',
+    productPrice: 0,
+    productStock: 0,
+    productStatus: 'APPROVED',
   });
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [images, setImages] = useState([
-    { id: 1, label: '대표 이미지', isMain: true },
-    { id: 2, label: '보조 이미지 1', isMain: false },
-  ]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await productApi.getProductDetails(productId);
 
-  const [options, setOptions] = useState([{ id: 1, name: '색상', values: '블랙, 화이트' }]);
+        setFormData({
+          productName: resp.data.productName,
+          productDescription: resp.data.productDescription,
+          categoryId: resp.data.categoryId,
+          productPrice: resp.data.productPrice,
+          productStock: resp.data.productStock,
+          productStatus:
+            resp.data.productStatus === 'PENDING' ? 'APPROVED' : resp.data.productStatus,
+        });
 
-  const handleFormChange = (field) => (event) => {
-    setForm((prev) => ({
-      ...prev,
-      [field]: event.target.value,
-    }));
+        setImages(
+          resp.data.productImages.map((img) => {
+            return {
+              imageId: img.imageId,
+              file: null,
+              originalFileName: null,
+              altText: img.altText || '',
+              sequence: img.imageSequence,
+              preview: img.imageUrl,
+            };
+          }),
+        );
+      } catch (err) {
+        toast.error('상품 정보를 불러오는 중에 오류가 발생했습니다.');
+      }
+    })();
+  }, []);
+
+  // variables and constants
+  const statusOptions = [
+    {
+      value: 'APPROVED',
+      label: '판매중',
+      desc: '현재 상품을 판매중 상태로 유지합니다.',
+      activeStyle: 'bg-blue-100 text-blue-600 dark:text-blue-400 dark:bg-blue-900',
+      inactiveStyle: 'bg-transparent text-blue-600 dark:text-blue-400',
+    },
+    {
+      value: 'PAUSED',
+      label: '일시중지',
+      desc: '상품 노출을 잠시 중단하지만 정보는 유지합니다.',
+      activeStyle: 'bg-yellow-100 text-yellow-600 dark:text-yellow-400 dark:bg-yellow-900',
+      inactiveStyle: 'bg-transparent text-yellow-600 dark:text-yellow-400',
+    },
+    {
+      value: 'DELETED',
+      label: '삭제됨',
+      desc: '상품을 비공개로 전환하고 삭제된 상태로 표시합니다. 상품의 정보는 유지됩니다.',
+      activeStyle: 'bg-red-100 text-red-600 dark:text-red-400 dark:bg-red-900',
+      inactiveStyle: 'bg-transparent text-red-600 dark:text-red-400',
+    },
+  ];
+
+  // helper functions
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.productName) {
+      newErrors.productName = '상품명을 입력해주세요.';
+    }
+
+    if (!formData.productDescription) {
+      newErrors.productDescription = '상품 설명을 입력해주세요.';
+    }
+
+    if (!formData.categoryId) {
+      newErrors.categoryId = '카테고리를 선택해주세요.';
+    }
+
+    if (formData.productPrice < 0) {
+      newErrors.productPrice = '가격은 0 이상이어야 합니다.';
+    }
+
+    if (formData.productStock < 0) {
+      newErrors.productStock = '재고는 0 이상이어야 합니다.';
+    }
+
+    if (images.length === 0) {
+      newErrors.images = '최소 하나의 상품 사진을 업로드해주세요.';
+    }
+
+    // 대체 텍스트 검증
+    const imagesWithoutAlt = images.filter((img) => !img.altText?.trim() && img.sequence < 10);
+    if (imagesWithoutAlt.length > 0) {
+      newErrors.imageAlt = '모든 사진에 대체 텍스트를 입력해주세요.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // handlers
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    // 에러 클리어
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleStatusChange = (value) => {
-    setForm((prev) => ({
+    setFormData((prev) => ({
       ...prev,
-      status: value,
+      productStatus: value,
     }));
   };
 
-  // 이미지 관리
-  const handleAddImage = () => {
-    setImages((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        label: '새 이미지',
-        isMain: false,
-      },
-    ]);
-  };
-
-  const handleRemoveImage = (id) => {
-    setImages((prev) => prev.filter((img) => img.id !== id));
-  };
-
-  const handleSetMainImage = (id) => {
-    setImages((prev) =>
-      prev.map((img) => ({
-        ...img,
-        isMain: img.id === id,
-      })),
-    );
-  };
-
-  // 옵션 관리
-  const handleOptionChange = (id, field, value) => {
-    setOptions((prev) => prev.map((opt) => (opt.id === id ? { ...opt, [field]: value } : opt)));
-  };
-
-  const handleAddOptionRow = () => {
-    setOptions((prev) => [...prev, { id: Date.now(), name: '', values: '' }]);
-  };
-
-  const handleRemoveOptionRow = (id) => {
-    setOptions((prev) => prev.filter((opt) => opt.id !== id));
-  };
-
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // TODO: 상품 수정 API 연동
+    setIsSubmitting(true);
+
+    if (!validateForm()) {
+      toast.error('폼에 오류가 있습니다. 수정 후 다시 시도해주세요.');
+      setIsSubmitting(false);
+
+      console.log('Validation errors:', errors);
+      return;
+    }
+
+    try {
+      const imageMetadataList = images.map((img) => ({
+        imageId: img.imageId || null,
+        sequence: img.sequence,
+        altText: img.altText || '',
+        originalFileName: img.file ? img.file.name : null,
+        isNew: !!img.file,
+      }));
+
+      const submitData = {
+        ...formData,
+        imageMetadataList: imageMetadataList,
+      };
+
+      await sellerApi.updateProduct(productId, submitData, images);
+      toast.success('상품이 성공적으로 수정되었습니다.');
+
+      navigate({
+        to: '/seller/products',
+      });
+    } catch (error) {
+      toast.error('상품 수정 중에 오류가 발생했습니다.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <main className='mx-auto mt-20 max-w-6xl px-4 py-10 text-[#333333]'>
+    <main className='font-kakao-big mx-auto max-w-6xl px-4 py-10'>
       {/* 상단 제목 */}
       <header className='mb-6'>
-        <h1 className='font-kakao-big text-xl font-semibold'>상품 수정</h1>
+        <h1 className='text-xl font-semibold'>상품 수정</h1>
         <p className='mt-1 text-xs text-gray-500'>
           상품 정보를 수정하고 상태를 변경할 수 있습니다.
         </p>
       </header>
 
+      {Object.keys(errors).length > 0 && (
+        <Alert
+          variant='destructive'
+          className='mb-4 items-center has-[>svg]:grid-cols-[calc(var(--spacing)*6)_1fr] [&>svg]:row-span-2 [&>svg]:size-6'
+        >
+          <AlertCircleIcon />
+          <AlertTitle className='text-base font-bold'>
+            수정된 상품 정보에 오류가 있습니다.
+          </AlertTitle>
+          <AlertDescription>
+            <p className='p-0'>다음 항목을 확인해주세요.</p>
+            <ul className='list-disc pl-5 text-sm'>
+              {Object.values(errors).map((error, index) => (
+                <li key={index}>{error}</li>
+              ))}
+            </ul>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <form onSubmit={handleSubmit}>
-        <div className='grid gap-6 md:grid-cols-[minmax(0,2.3fr)_minmax(260px,1fr)]'>
-          {/* ===== 왼쪽: 정보 / 이미지 / 옵션 ===== */}
-          <div className='space-y-6'>
-            {/* 기본 정보 카드 */}
-            <section className='rounded-3xl border border-gray-200 bg-white p-6 shadow-sm'>
-              <h2 className='font-kakao-big mb-4 text-sm font-semibold'>기본 정보</h2>
+        <FieldGroup>
+          <div className='grid gap-6 md:grid-cols-[minmax(0,2.3fr)_minmax(260px,1fr)]'>
+            {/* ===== 왼쪽: 정보 / 이미지 / 옵션 ===== */}
+            <div className='space-y-6'>
+              {/* 기본 정보 카드 */}
+              <section className='rounded-3xl border p-6 shadow-sm'>
+                <h2 className='mb-4 text-sm font-semibold'>기본 정보</h2>
 
-              <div className='space-y-4'>
-                {/* 상품명 */}
-                <FieldGroup className='gap-4 md:grid md:grid-cols-2'>
-                  <Field>
-                    <Label
-                      htmlFor='name'
-                      className='font-kakao-big text-xs'
-                    >
-                      상품명 *
-                    </Label>
-                    <Input
-                      id='name'
-                      value={form.name}
-                      onChange={handleFormChange('name')}
-                      className='mt-1 h-9 text-xs'
-                      placeholder='상품명을 입력하세요'
-                      required
-                    />
-                  </Field>
+                <div className='space-y-4'>
+                  {/* 상품명 */}
+                  <FieldSet>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className='flex items-center gap-2'>
+                          <Package className='h-5 w-5' />
+                          기본 정보
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className='space-y-4'>
+                        {/* 상품명 */}
+                        <Field className='gap-0'>
+                          <FieldLabel htmlFor='productName'>
+                            상품명
+                            <span
+                              className='text-red-500'
+                              aria-label='필수'
+                            >
+                              *
+                            </span>
+                          </FieldLabel>
+                          <Input
+                            id='productName'
+                            name='productName'
+                            type='text'
+                            value={formData.productName}
+                            onChange={handleInputChange}
+                            placeholder='상품명을 입력하세요'
+                            aria-required='true'
+                            aria-invalid={!!errors.productName}
+                            aria-describedby={errors.productName ? 'productName-error' : undefined}
+                            className='mt-1'
+                            disabled={isSubmitting}
+                          />
+                          {errors.productName && (
+                            <p
+                              id='productName-error'
+                              className='mt-1 text-sm text-red-500'
+                              role='alert'
+                            >
+                              {errors.productName}
+                            </p>
+                          )}
+                        </Field>
 
-                  <Field>
-                    <Label
-                      htmlFor='summary'
-                      className='font-kakao-big text-xs'
-                    >
-                      한 줄 설명
-                    </Label>
-                    <Input
-                      id='summary'
-                      value={form.summary}
-                      onChange={handleFormChange('summary')}
-                      className='mt-1 h-9 text-xs'
-                      placeholder='상품 특징을 간단히 입력하세요'
-                    />
-                  </Field>
-                </FieldGroup>
+                        {/* 카테고리 */}
 
-                {/* 브랜드 / 카테고리 */}
-                <FieldGroup className='gap-4 md:grid md:grid-cols-2'>
-                  <Field>
-                    <Label
-                      htmlFor='brand'
-                      className='font-kakao-big text-xs'
-                    >
-                      브랜드
-                    </Label>
-                    <Input
-                      id='brand'
-                      value={form.brand}
-                      onChange={handleFormChange('brand')}
-                      className='mt-1 h-9 text-xs'
-                      placeholder='브랜드명을 입력하세요'
-                    />
-                  </Field>
+                        <FieldGroup className='gap-4'>
+                          <Field className='gap-0'>
+                            <FieldLabel htmlFor='parentCategoryId'>
+                              카테고리
+                              <span
+                                className='text-red-500'
+                                aria-label='필수'
+                              >
+                                *
+                              </span>
+                            </FieldLabel>
+                            <Select
+                              value={formData.categoryId}
+                              onValueChange={(value) => {
+                                setFormData((prev) => ({ ...prev, categoryId: value }));
+                                // 에러 클리어
+                                if (errors.categoryId) {
+                                  setErrors((prev) => ({ ...prev, categoryId: '' }));
+                                }
+                              }}
+                            >
+                              <SelectTrigger
+                                aria-required='true'
+                                aria-invalid={!!errors.categoryId}
+                                aria-describedby={
+                                  errors.categoryId ? 'categoryId-error' : 'category-description'
+                                }
+                                className='mt-1'
+                                disabled={isSubmitting}
+                              >
+                                <SelectValue placeholder='카테고리 선택' />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {categories.map((category) => (
+                                  <SelectGroup key={category.categoryId}>
+                                    <SelectLabel>{category.categoryName}</SelectLabel>
+                                    {category.subCategories.map((subCategory) => (
+                                      <SelectItem
+                                        value={subCategory.categoryId}
+                                        key={subCategory.categoryId}
+                                      >
+                                        {subCategory.categoryName}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectGroup>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </Field>
 
-                  <Field>
-                    <Label
-                      htmlFor='category'
-                      className='font-kakao-big text-xs'
-                    >
-                      카테고리
-                    </Label>
-                    <select
-                      id='category'
-                      value={form.category}
-                      onChange={handleFormChange('category')}
-                      className='mt-1 h-9 w-full rounded border border-gray-300 bg-white px-3 text-xs'
-                    >
-                      <option value=''>카테고리 선택</option>
-                      <option value='보조공학기기'>보조공학기기</option>
-                      <option value='생활용품'>생활용품</option>
-                      <option value='기타'>기타</option>
-                    </select>
-                  </Field>
-                </FieldGroup>
+                          {errors.categoryId && (
+                            <p
+                              id='categoryId-error'
+                              className='text-sm text-red-500'
+                              role='alert'
+                            >
+                              {errors.categoryId}
+                            </p>
+                          )}
+                        </FieldGroup>
 
-                {/* 가격 / 재고 */}
-                <FieldGroup className='gap-4 md:grid md:grid-cols-2'>
-                  <Field>
-                    <Label
-                      htmlFor='price'
-                      className='font-kakao-big text-xs'
-                    >
-                      판매가 *
-                    </Label>
-                    <div className='mt-1 flex items-center gap-2'>
-                      <Input
-                        id='price'
-                        type='number'
-                        min='0'
-                        value={form.price}
-                        onChange={handleFormChange('price')}
-                        className='h-9 text-xs'
-                        placeholder='0'
-                        required
+                        {/* 상품 설명 */}
+                        <Field className='gap-0'>
+                          <FieldLabel htmlFor='productDescription'>
+                            상품 설명{' '}
+                            <span
+                              className='text-red-500'
+                              aria-label='필수'
+                            >
+                              *
+                            </span>
+                          </FieldLabel>
+                          <Textarea
+                            id='productDescription'
+                            name='productDescription'
+                            value={formData.productDescription}
+                            onChange={handleInputChange}
+                            placeholder='상품에 대한 상세한 설명을 입력하세요'
+                            rows={6}
+                            aria-required='true'
+                            aria-invalid={!!errors.productDescription}
+                            aria-describedby={
+                              errors.productDescription ? 'productDescription-error' : undefined
+                            }
+                            disabled={isSubmitting}
+                            className='mt-1'
+                          />
+                          {errors.productDescription && (
+                            <p
+                              id='productDescription-error'
+                              className='mt-1 text-sm text-red-500'
+                              role='alert'
+                            >
+                              {errors.productDescription}
+                            </p>
+                          )}
+                        </Field>
+
+                        {/* 가격과 재고 */}
+                        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                          <Field className='gap-0'>
+                            <Label
+                              htmlFor='productPrice'
+                              className='flex items-center gap-1'
+                            >
+                              <DollarSign className='h-4 w-4' />
+                              가격
+                              <span
+                                className='text-red-500'
+                                aria-label='필수'
+                              >
+                                *
+                              </span>
+                            </Label>
+                            <Input
+                              id='productPrice'
+                              name='productPrice'
+                              type='number'
+                              min='0'
+                              step='1'
+                              value={formData.productPrice}
+                              onChange={handleInputChange}
+                              placeholder='0'
+                              aria-required='true'
+                              aria-invalid={!!errors.productPrice}
+                              aria-describedby={
+                                errors.productPrice ? 'productPrice-error' : undefined
+                              }
+                              disabled={isSubmitting}
+                              className='mt-1'
+                            />
+                            {errors.productPrice && (
+                              <p
+                                id='productPrice-error'
+                                className='mt-1 text-sm text-red-500'
+                                role='alert'
+                              >
+                                {errors.productPrice}
+                              </p>
+                            )}
+                          </Field>
+
+                          <Field className='gap-0'>
+                            <Label
+                              htmlFor='productStock'
+                              className='flex items-center gap-1'
+                            >
+                              <Archive className='h-4 w-4' />
+                              재고
+                              <span
+                                className='text-red-500'
+                                aria-label='필수'
+                              >
+                                *
+                              </span>
+                            </Label>
+                            <Input
+                              id='productStock'
+                              name='productStock'
+                              type='number'
+                              min='0'
+                              step='1'
+                              value={formData.productStock}
+                              onChange={handleInputChange}
+                              placeholder='0'
+                              aria-required='true'
+                              aria-invalid={!!errors.productStock}
+                              aria-describedby={
+                                errors.productStock ? 'productStock-error' : undefined
+                              }
+                              disabled={isSubmitting}
+                              className='mt-1'
+                            />
+                            {errors.productStock && (
+                              <p
+                                id='productStock-error'
+                                className='mt-1 text-sm text-red-500'
+                                role='alert'
+                              >
+                                {errors.productStock}
+                              </p>
+                            )}
+                          </Field>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </FieldSet>
+
+                  {/* 상품 사진 섹션 */}
+                  <FieldSet>
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className='flex items-center gap-2'>
+                          <Image className='h-5 w-5' />
+                          상품 사진
+                        </CardTitle>
+                        <p className='mt-2 text-sm text-gray-500'>
+                          첫 번째 사진이 대표 사진으로 설정됩니다. 최대 10개까지 업로드 가능합니다.
+                        </p>
+                      </CardHeader>
+                      <CardContent>
+                        <ImageUploadSection
+                          images={images}
+                          onImagesChange={setImages}
+                          sectionType='product'
+                        />
+                        {errors.images && (
+                          <p
+                            className='mt-2 text-sm text-red-500'
+                            role='alert'
+                          >
+                            {errors.images}
+                          </p>
+                        )}
+                        {errors.imageAlt && (
+                          <p
+                            className='mt-2 text-sm text-red-500'
+                            role='alert'
+                          >
+                            {errors.imageAlt}
+                          </p>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </FieldSet>
+
+                  {/* 상세 정보 사진 섹션 */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className='flex items-center gap-2'>
+                        <Image className='h-5 w-5' />
+                        상세 정보 사진
+                      </CardTitle>
+                      <p className='mt-2 text-sm text-gray-500'>
+                        {'상품의 상세 정보를 설명하는 사진을 업로드하세요. (선택사항)'}
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      <ImageUploadSection
+                        images={images}
+                        onImagesChange={setImages}
+                        sectionType='detail'
+                        disabled={isSubmitting}
                       />
-                      <span className='text-[11px] text-gray-500'>원</span>
-                    </div>
-                  </Field>
+                    </CardContent>
+                  </Card>
+                </div>
+              </section>
+            </div>
 
-                  <Field>
-                    <Label
-                      htmlFor='stock'
-                      className='font-kakao-big text-xs'
-                    >
-                      재고 수량 *
-                    </Label>
-                    <div className='mt-1 flex items-center gap-2'>
-                      <Input
-                        id='stock'
-                        type='number'
-                        min='0'
-                        value={form.stock}
-                        onChange={handleFormChange('stock')}
-                        className='h-9 text-xs'
-                        placeholder='0'
-                        required
-                      />
-                      <span className='text-[11px] text-gray-500'>개</span>
-                    </div>
-                  </Field>
-                </FieldGroup>
-              </div>
-            </section>
-
-            {/* 이미지 관리 카드 */}
-            <section className='rounded-3xl border border-gray-200 bg-white p-6 shadow-sm'>
-              <h2 className='font-kakao-big mb-4 text-sm font-semibold'>이미지 관리</h2>
-
-              <div className='flex flex-wrap gap-4'>
-                {/* 새 이미지 추가 박스 */}
-                <button
-                  type='button'
-                  onClick={handleAddImage}
-                  className='flex h-28 w-28 items-center justify-center rounded border border-dashed border-gray-300 bg-[#fafafa] text-xs text-gray-500'
+            {/* ===== 오른쪽: 상태 관리 ===== */}
+            <aside className='space-y-6'>
+              <section className='rounded-3xl border p-6 shadow-sm'>
+                <h2 className='mb-4 text-sm font-semibold'>상태 관리</h2>
+                <RadioGroup
+                  value={formData.productStatus}
+                  onValueChange={handleStatusChange}
                 >
-                  +
-                </button>
-
-                {/* 기존 이미지들 */}
-                {images.map((img) => (
-                  <div
-                    key={img.id}
-                    className='flex h-28 w-28 flex-col justify-between rounded border border-gray-300 bg-[#fdfdfd] p-2 text-[11px]'
-                  >
-                    <div className='h-14 rounded bg-gray-200' />
-                    <div className='mt-1 flex flex-col gap-1'>
-                      <span className='truncate text-gray-700'>{img.label}</span>
-                      <div className='flex items-center justify-between'>
-                        <button
-                          type='button'
-                          className={`rounded px-2 py-0.5 text-[10px] ${
-                            img.isMain
-                              ? 'bg-black text-white'
-                              : 'border border-gray-300 text-gray-600'
-                          }`}
-                          onClick={() => handleSetMainImage(img.id)}
+                  {statusOptions.map((option) => (
+                    <Item
+                      variant='outline'
+                      className={`items-start ${formData.productStatus === option.value ? option.activeStyle : option.inactiveStyle}`}
+                      key={option.value}
+                    >
+                      <ItemContent className='flex flex-row items-center gap-3'>
+                        <RadioGroupItem
+                          value={option.value}
+                          id={option.value}
+                          className='border-neutral-400'
+                        />
+                        <Label
+                          htmlFor={option.value}
+                          className='flex cursor-pointer flex-col items-start'
                         >
-                          대표
-                        </button>
-                        <button
-                          type='button'
-                          className='text-[10px] text-red-500'
-                          onClick={() => handleRemoveImage(img.id)}
-                        >
-                          삭제
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                          <span className='font-medium'>{option.label}</span>
+                          <p className='text-sm text-gray-500 dark:text-neutral-300'>
+                            {option.desc}
+                          </p>
+                        </Label>
+                      </ItemContent>
+                    </Item>
+                  ))}
+                </RadioGroup>
+              </section>
 
-              <p className='mt-3 text-[11px] text-gray-500'>
-                첫 번째 이미지는 대표 이미지로 사용됩니다. 이미지 업로드 기능은 이후에 서버와
-                연동됩니다.
-              </p>
-            </section>
-
-            {/* 옵션 관리 카드 */}
-            <section className='rounded-3xl border border-gray-200 bg-white p-6 shadow-sm'>
-              <div className='mb-4 flex items-center justify-between'>
-                <h2 className='font-kakao-big text-sm font-semibold'>옵션 관리</h2>
-                <Button
-                  type='button'
-                  variant='outline'
-                  size='sm'
-                  className='font-kakao-big h-8 px-3 text-xs'
-                  onClick={handleAddOptionRow}
-                >
-                  옵션 추가
-                </Button>
-              </div>
-
-              <div className='space-y-3'>
-                {options.map((opt) => (
-                  <FieldGroup
-                    key={opt.id}
-                    className='items-end gap-3 rounded-2xl bg-[#fafafa] p-3 md:grid md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.4fr)_auto]'
+              {/* 하단 저장 버튼 */}
+              <section className='rounded-3xl border p-4 shadow-sm'>
+                <div className='flex flex-col gap-2'>
+                  <Button
+                    type='submit'
+                    className='h-9 w-full'
                   >
-                    <Field>
-                      <Label
-                        htmlFor={`opt-name-${opt.id}`}
-                        className='font-kakao-big text-xs'
-                      >
-                        옵션명
-                      </Label>
-                      <Input
-                        id={`opt-name-${opt.id}`}
-                        value={opt.name}
-                        onChange={(e) => handleOptionChange(opt.id, 'name', e.target.value)}
-                        className='mt-1 h-8 text-xs'
-                        placeholder='예: 색상'
-                      />
-                    </Field>
-
-                    <Field>
-                      <Label
-                        htmlFor={`opt-values-${opt.id}`}
-                        className='font-kakao-big text-xs'
-                      >
-                        옵션 값
-                      </Label>
-                      <Input
-                        id={`opt-values-${opt.id}`}
-                        value={opt.values}
-                        onChange={(e) => handleOptionChange(opt.id, 'values', e.target.value)}
-                        className='mt-1 h-8 text-xs'
-                        placeholder='쉼표(,)로 구분 — 예: 블랙, 화이트'
-                      />
-                    </Field>
-
-                    <div className='flex justify-end'>
-                      <Button
-                        type='button'
-                        variant='ghost'
-                        className='mt-4 h-8 px-2 text-xs text-red-500'
-                        onClick={() => handleRemoveOptionRow(opt.id)}
-                      >
-                        삭제
-                      </Button>
-                    </div>
-                  </FieldGroup>
-                ))}
-
-                {options.length === 0 && (
-                  <p className='text-[11px] text-gray-500'>
-                    아직 등록된 옵션이 없습니다. 상단 &quot;옵션 추가&quot; 버튼을 눌러 옵션을
-                    추가해 주세요.
-                  </p>
-                )}
-              </div>
-            </section>
+                    수정 내용 저장
+                  </Button>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    className='h-9 w-full'
+                  >
+                    취소
+                  </Button>
+                </div>
+              </section>
+            </aside>
           </div>
-
-          {/* ===== 오른쪽: 상태 관리 ===== */}
-          <aside className='space-y-6'>
-            <section className='rounded-3xl border border-gray-200 bg-white p-6 shadow-sm'>
-              <h2 className='font-kakao-big mb-4 text-sm font-semibold'>상태 관리</h2>
-
-              <FieldGroup className='space-y-2'>
-                <Field>
-                  <label className='flex items-center justify-between rounded-2xl border px-3 py-2 text-xs'>
-                    <div>
-                      <span className='font-kakao-big'>판매중</span>
-                      <p className='mt-0.5 text-[11px] text-gray-500'>
-                        현재 상품을 판매중 상태로 유지합니다.
-                      </p>
-                    </div>
-                    <input
-                      type='radio'
-                      name='status'
-                      value='on'
-                      checked={form.status === 'on'}
-                      onChange={() => handleStatusChange('on')}
-                    />
-                  </label>
-                </Field>
-
-                <Field>
-                  <label className='flex items-center justify-between rounded-2xl border px-3 py-2 text-xs'>
-                    <div>
-                      <span className='font-kakao-big'>일시중지</span>
-                      <p className='mt-0.5 text-[11px] text-gray-500'>
-                        상품 노출을 잠시 중단하지만 정보는 유지합니다.
-                      </p>
-                    </div>
-                    <input
-                      type='radio'
-                      name='status'
-                      value='pause'
-                      checked={form.status === 'pause'}
-                      onChange={() => handleStatusChange('pause')}
-                    />
-                  </label>
-                </Field>
-
-                <Field>
-                  <label className='flex items-center justify-between rounded-2xl border px-3 py-2 text-xs'>
-                    <div>
-                      <span className='font-kakao-big'>추가 준비중</span>
-                      <p className='mt-0.5 text-[11px] text-gray-500'>
-                        신규 옵션/이미지 등을 수정 중인 상태입니다.
-                      </p>
-                    </div>
-                    <input
-                      type='radio'
-                      name='status'
-                      value='prepare'
-                      checked={form.status === 'prepare'}
-                      onChange={() => handleStatusChange('prepare')}
-                    />
-                  </label>
-                </Field>
-
-                <Field>
-                  <label className='flex items-center justify-between rounded-2xl border px-3 py-2 text-xs'>
-                    <div>
-                      <span className='font-kakao-big text-red-500'>삭제 예정</span>
-                      <p className='mt-0.5 text-[11px] text-gray-500'>
-                        상품을 비공개로 전환하고 삭제 예정 상태로 표시합니다.
-                      </p>
-                    </div>
-                    <input
-                      type='radio'
-                      name='status'
-                      value='deleted'
-                      checked={form.status === 'deleted'}
-                      onChange={() => handleStatusChange('deleted')}
-                    />
-                  </label>
-                </Field>
-              </FieldGroup>
-            </section>
-
-            {/* 하단 저장 버튼 */}
-            <section className='rounded-3xl border border-gray-200 bg-[#fafafa] p-4 shadow-sm'>
-              <div className='flex flex-col gap-2'>
-                <Button
-                  type='submit'
-                  className='font-kakao-big h-9 w-full'
-                >
-                  수정 내용 저장
-                </Button>
-                <Button
-                  type='button'
-                  variant='outline'
-                  className='font-kakao-big h-9 w-full'
-                >
-                  취소
-                </Button>
-              </div>
-            </section>
-          </aside>
-        </div>
+        </FieldGroup>
       </form>
     </main>
   );

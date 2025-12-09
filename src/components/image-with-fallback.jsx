@@ -12,7 +12,7 @@ export const ImageWithFallback = ({ src, alt, style, className, ...rest }) => {
       setError(true);
     }
 
-    if (/^http/i.test(src)) {
+    if (src.startsWith('http') || src.startsWith('blob:')) {
       return src;
     }
 

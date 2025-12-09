@@ -1,3 +1,4 @@
+import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Field } from '@/components/ui/field';
@@ -120,8 +121,8 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
               <CardContent className='p-4'>
                 <div className='space-y-3'>
                   <div className='relative aspect-video overflow-hidden rounded-md bg-gray-100'>
-                    <img
-                      src={image.preview}
+                    <ImageWithFallback
+                      src={image.preview || image.imageUrl}
                       alt={
                         image.altText ||
                         `${sectionType === 'product' ? '상품' : '상세'} 사진 ${image.sequence + 1}`
@@ -159,7 +160,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
                         htmlFor={`alt-${image.sequence}`}
                         className='text-xs'
                       >
-                        대체 텍스트 (필수)
+                        {'대체 텍스트 (필수)'}
                       </Label>
                       <Input
                         id={`alt-${image.sequence}`}
