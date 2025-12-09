@@ -46,10 +46,10 @@ function A11ySettingsPage() {
         textSpacingLevel: p.textSpacingLevel,
         lineHeightLevel: p.lineHeightLevel,
         textAlign: p.textAlign,
-        screenReader: p.screenReader === 1,
-        smartContrast: p.smartContrast === 1,
-        highlightLinks: p.highlightLinks === 1,
-        cursorHighlight: p.cursorHighlight === 1,
+        screenReader: p.screenReader,
+        smartContrast: p.smartContrast,
+        highlightLinks: p.highlightLinks,
+        cursorHighlight: p.cursorHighlight,
       }),
     );
     toast.success(`"${p.profileName}" 프로필이 적용되었습니다.`);
@@ -70,10 +70,10 @@ function A11ySettingsPage() {
         textSpacingLevel: p.textSpacingLevel,
         lineHeightLevel: p.lineHeightLevel,
         textAlign: p.textAlign,
-        screenReader: p.screenReader === 1,
-        smartContrast: p.smartContrast === 1,
-        highlightLinks: p.highlightLinks === 1,
-        cursorHighlight: p.cursorHighlight === 1,
+        screenReader: p.screenReader,
+        smartContrast: p.smartContrast,
+        highlightLinks: p.highlightLinks,
+        cursorHighlight: p.cursorHighlight,
       }),
     );
     setEditingProfile(p);
@@ -94,7 +94,7 @@ function A11ySettingsPage() {
 
   return (
     <div className='mx-auto flex max-w-4xl flex-col gap-8 px-4 py-8'>
-      <Card className='border-slate-200 bg-white'>
+      <Card>
         <CardHeader>
           <CardTitle className='text-2xl'>접근성 프로필 관리</CardTitle>
           <CardDescription className='text-gray-600'>
@@ -104,7 +104,7 @@ function A11ySettingsPage() {
 
         <CardContent className='space-y-6 p-6'>
           <div className='flex items-center justify-between'>
-            <h2 className='font-kakao-big text-lg text-slate-800'>저장된 프로필</h2>
+            <h2 className='text-lg'>저장된 프로필</h2>
             <Button onClick={handleCreate}>새 프로필 추가</Button>
           </div>
 

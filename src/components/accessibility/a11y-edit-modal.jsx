@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Field, FieldGroup } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -160,6 +161,7 @@ export default function A11yEditModal({ open, onClose, initialProfile, onSaved }
       onOpenChange={onClose}
     >
       <DialogContent className='max-w-md'>
+        <ScrollArea className='max-h-[80vh] px-6 py-4'>
         <DialogHeader>
           <DialogTitle className='text-lg font-bold'>
             {initialProfile ? '접근성 프로필 수정' : '접근성 프로필 생성'}
@@ -331,6 +333,7 @@ export default function A11yEditModal({ open, onClose, initialProfile, onSaved }
             </Button>
           </DialogFooter>
         </form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

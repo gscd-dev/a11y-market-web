@@ -14,10 +14,10 @@ export default function A11yProfileList({ profiles, onApply, onEdit, onDelete })
           className='rounded-xl p-4 shadow-sm transition-shadow hover:shadow-md'
         >
           <ItemContent className='space-y-1'>
-            <ItemTitle className='text-slate-900'>{p.profileName}</ItemTitle>
+            <ItemTitle >{p.profileName}</ItemTitle>
 
             {p.description && (
-              <ItemDescription className='text-sm text-slate-600'>{p.description}</ItemDescription>
+              <ItemDescription className=' text-slate-600'>{p.description}</ItemDescription>
             )}
           </ItemContent>
           <ItemActions className='flex gap-2'>
