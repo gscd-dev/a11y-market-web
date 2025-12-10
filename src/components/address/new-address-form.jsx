@@ -5,6 +5,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const EMPTY_FORM = {
   addressId: undefined,
@@ -39,7 +40,7 @@ export default function NewAddressForm({ initialForm = null, onSave, onCancel })
   const handleSubmit = (e) => {
     e?.preventDefault?.();
     if (!form.addressName || !form.receiverName || !form.receiverZipcode || !form.receiverAddr1) {
-      alert('입력하지 않은 항목이 있습니다.');
+      toast.message('입력하지 않은 항목이 있습니다.');
       return;
     }
     onSave && onSave(form);

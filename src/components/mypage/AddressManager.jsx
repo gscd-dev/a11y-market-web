@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { useState, useEffect } from 'react';
 import { addressApi } from '@/api/address-api';
+import { toast } from 'sonner';
 
 export const AddressManager = () => {
   const [activeTab, setActiveTab] = useState('default');
@@ -18,9 +19,9 @@ export const AddressManager = () => {
     try {
       await addressApi.deleteAddress(addressId);
       setAddresses((prev) => prev.filter((a) => a.addressId !== addressId));
-      alert('배송지가 삭제되었습니다,');
+      toast.success('배송지가 삭제되었습니다,');
     } catch (err) {
-      alert('배송지 삭제를 실패했습니다.');
+      toast.message('배송지 삭제를 실패했습니다.');
     }
   };
 
@@ -41,9 +42,9 @@ export const AddressManager = () => {
         return [...prev, updated];
       });
       setEditingAddress(null);
-      alert('배송지를 저장했습니다.');
+      toast.success('배송지를 저장했습니다.');
     } catch (err) {
-      alert('배송지 저장을 실패했습니다.');
+      toast.message('배송지 저장을 실패했습니다.');
     }
   };
 
