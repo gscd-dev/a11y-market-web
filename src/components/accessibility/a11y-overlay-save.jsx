@@ -15,9 +15,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { AlertCircleIcon } from 'lucide-react';
 import { useState } from 'react';
 
-export default function A11yOverlaySave({ open, onClose, reloadProfiles, a11yState }) {
+export default function A11yOverlaySave({ open, onClose, a11yState }) {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+
   const [errors, setErrors] = useState({
     submit: null,
     name: null,
@@ -37,41 +38,35 @@ export default function A11yOverlaySave({ open, onClose, reloadProfiles, a11ySta
         profileName: name.trim(),
         description: description.trim() || null,
 
-        contrastLevel: a11yState.contrastLevel,
-        textSizeLevel: a11yState.textSizeLevel,
-        textSpacingLevel: a11yState.textSpacingLevel,
-        lineHeightLevel: a11yState.lineHeightLevel,
-        textAlign: a11yState.textAlign,
-        screenReader: a11yState.screenReader ? 1 : 0,
-        smartContrast: a11yState.smartContrast ? 1 : 0,
-        highlightLinks: a11yState.highlightLinks ? 1 : 0,
-        cursorHighlight: a11yState.cursorHighlight ? 1 : 0,
+        ...a11yState,
+        screenReader: a11yState.screenReader,
+        smartContrast: a11yState.smartContrast,
+        highlightLinks: a11yState.highlightLinks,
+        cursorHighlight: a11yState.cursorHighlight,
       };
 
       const resp = await a11yApi.createA11yProfile(payload);
 
-      if (!resp.status) {
-        setErrors((prev) => ({ ...prev, submit: resp.message || '프로필 저장에 실패했습니다.' }));
+      if (resp.status === 201) {
+        window.dispatchEvent(new Event('a11yProfileSaved'));
+        alert('프로필이 저장되었습니다.');
+        setName('');
+        setDescription('');
+        onClose();
         return;
       }
 
-      if (resp.status !== 201) {
-        if (resp.status === 409) {
-          setErrors((prev) => ({ ...prev, name: '이미 존재하는 프로필 이름입니다.' }));
-        } else if (resp.status === 400) {
-          setErrors((prev) => ({ ...prev, submit: resp.message || '잘못된 요청입니다.' }));
-        } else {
-          setErrors((prev) => ({ ...prev, submit: '프로필 저장에 실패했습니다.' }));
-        }
+      if (resp.status === 409) {
+        setErrors((prev) => ({ ...prev, name: '이미 존재하는 프로필 이름입니다.' }));
+        return;
+      } else if (resp.status === 400) {
+        setErrors((prev) => ({ ...prev, submit: resp.message || '잘못된 요청입니다.' }));
+        return;
+      } else {
+        setErrors((prev) => ({ ...prev, submit: '프로필 저장에 실패했습니다.' }));
         return;
       }
 
-      window.dispatchEvent(new Event('a11yProfileSaved'));
-      alert('프로필이 저장되었습니다.');
-      setName('');
-      setDescription('');
-
-      onClose();
     } catch (err) {
       if (err.error === 'Unauthorized') {
         setErrors((prev) => ({ ...prev, submit: '로그인이 필요합니다.' }));
