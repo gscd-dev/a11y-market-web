@@ -1,7 +1,7 @@
 import { userApi } from '@/api/user-api';
 import { AccountInfo } from '@/components/mypage/AccounInfo';
+import { AddressManager } from '@/components/mypage/AddressManager';
 import { OrderHistory } from '@/components/mypage/OrderHistory';
-import A11ySettingsPage from './mypage/a11y';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,7 @@ import { FileText, LogOut, Store } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
+import A11ySettingsPage from './mypage/a11y';
 
 export const Route = createFileRoute('/_need-auth/_mypage/mypage')({
   component: RouteComponent,
@@ -201,6 +202,14 @@ function RouteComponent() {
 
               <TabsContent value='order'>
                 <OrderHistory />
+              </TabsContent>
+
+              <TabsContent value='a11y'>
+                <A11ySettingsPage />
+              </TabsContent>
+
+              <TabsContent value='address'>
+                <AddressManager />
               </TabsContent>
 
               <TabsContent value='a11y'>

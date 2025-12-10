@@ -1,14 +1,20 @@
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 
 const EMPTY_FORM = {
-  id: undefined,
+  addressId: undefined,
   addressName: '',
   receiverName: '',
-  zipcord: '',
-  address1: '',
-  address2: '',
-  phone: '',
+  receiverZipcode: '',
+  receiverAddr1: '',
+  receiverAddr2: '',
+  receiverPhone: '',
   isDefault: false,
 };
 
@@ -33,8 +39,8 @@ export default function NewAddressForm({ initialForm = null, onSave, onCancel })
 
   const handleSubmit = (e) => {
     e?.preventDefault?.();
-    if (!form.addressName || !form.receiverName || !form.zipcord || !form.address1) {
-      alert('배송지명, 수령인, 우편번호(또는 우편코드), 주소(주소1)는 필수입니다.');
+    if (!form.addressName || !form.receiverName || !form.receiverZipcode || !form.receiverAddr1) {
+      toast.message('입력하지 않은 항목이 있습니다.');
       return;
     }
     onSave && onSave(form);
@@ -46,103 +52,157 @@ export default function NewAddressForm({ initialForm = null, onSave, onCancel })
   };
 
   return (
-    <form
-      className='space-y-5'
-      onSubmit={handleSubmit}
-    >
-      <div>
-        <label className='mb-1 block'>배송지명</label>
-        <div className='flex items-center gap-2'>
-          <input
-            type='text'
-            name='addressName'
-            value={form.addressName}
-            onChange={handleChange}
-            placeholder='예: 우리집, 회사 등'
-            className='w-64 rounded-md border border-gray-300 p-2'
-          />
-          <label className='flex cursor-pointer items-center gap-1'>
-            <input
-              type='checkbox'
-              name='isDefault'
-              checked={!!form.isDefault}
-              onChange={handleChange}
-            />
-            기본배송지로 설정
-          </label>
-        </div>
-      </div>
+    <>
+      <Card>
+        <CardContent>
+          <form
+            className='space-y-4'
+            onSubmit={handleSubmit}
+          >
+            <FieldGroup>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='addressName'
+                    className='w-16'
+                  >
+                    배송지명
+                  </FieldLabel>
+                  <Input
+                    id='addressName'
+                    name='addressName'
+                    value={form.addressName}
+                    onChange={handleChange}
+                    placeholder='예: 우리집, 회사 등'
+                    className='w-64'
+                  />
+                  <Label>
+                    <Checkbox
+                      name='isDefault'
+                      checked={!!form.isDefault}
+                      onCheckedChange={(checked) =>
+                        setForm((prev) => ({ ...prev, isDefault: !!checked }))
+                      }
+                    />
+                    기본배송지로 설정
+                  </Label>
+                </div>
+              </Field>
 
-      <div>
-        <label className='mb-1 block'>수령인</label>
-        <input
-          type='text'
-          name='receiverName'
-          value={form.receiverName}
-          onChange={handleChange}
-          placeholder='수령인 이름'
-          className='w-72 rounded-md border border-gray-300 p-2'
-        />
-      </div>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='receiverName'
+                    className='w-16'
+                  >
+                    수령인
+                  </FieldLabel>
+                  <Input
+                    id='receiverName'
+                    name='receiverName'
+                    value={form.receiverName}
+                    onChange={handleChange}
+                    placeholder='수령인 이름'
+                    className='w-64'
+                  />
+                </div>
+              </Field>
 
-      <div>
-        <label className='mb-1 block'>연락처</label>
-        <input
-          type='text'
-          name='phone'
-          value={form.phone}
-          onChange={handleChange}
-          placeholder='01012345678'
-          className='w-72 rounded-md border border-gray-300 p-2'
-        />
-      </div>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='receiverPhone'
+                    className='w-16'
+                  >
+                    연락처
+                  </FieldLabel>
+                  <Input
+                    id='receiverPhone'
+                    name='receiverPhone'
+                    value={form.receiverPhone}
+                    onChange={handleChange}
+                    placeholder='01012345678'
+                    className='w-64'
+                  />
+                </div>
+              </Field>
 
-      <div>
-        <label className='mb-1 block'>우편번호(Zipcord)</label>
-        <input
-          type='text'
-          name='zipcord'
-          value={form.zipcord}
-          onChange={handleChange}
-          placeholder='예: 12345'
-          className='w-48 rounded-md border border-gray-300 p-2'
-        />
-      </div>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='receiverZipcode'
+                    className='w-16'
+                  >
+                    우편번호
+                  </FieldLabel>
+                  <Input
+                    id='receiverZipcode'
+                    name='receiverZipcode'
+                    value={form.receiverZipcode}
+                    onChange={handleChange}
+                    placeholder='예: 12345'
+                    className='w-64'
+                  />
+                </div>
+              </Field>
 
-      <div>
-        <label className='mb-1 block'>주소1</label>
-        <input
-          type='text'
-          name='address1'
-          value={form.address1}
-          onChange={handleChange}
-          placeholder='도로명/지번'
-          className='w-full rounded-md border border-gray-300 p-2'
-        />
-      </div>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='receiverAddr1'
+                    className='w-16'
+                  >
+                    주소1
+                  </FieldLabel>
+                  <Input
+                    id='receiverAddr1'
+                    name='receiverAddr1'
+                    value={form.receiverAddr1}
+                    onChange={handleChange}
+                    placeholder='도로명/지번'
+                    className='w-100'
+                  />
+                </div>
+              </Field>
 
-      <div>
-        <label className='mb-1 block'>주소2 (상세주소)</label>
-        <input
-          type='text'
-          name='address2'
-          value={form.address2}
-          onChange={handleChange}
-          placeholder='상세주소 예: 101동 1001호'
-          className='w-full rounded-md border border-gray-300 p-2'
-        />
-      </div>
+              <Field>
+                <div className='flex items-center gap-2'>
+                  <FieldLabel
+                    htmlFor='receiverAddr2'
+                    className='w-16'
+                  >
+                    주소2
+                  </FieldLabel>
+                  <Input
+                    id='receiverAddr2'
+                    name='receiverAddr2'
+                    value={form.receiverAddr2}
+                    onChange={handleChange}
+                    placeholder='상세주소 예: 101동 1001호'
+                    className='w-100'
+                  />
+                </div>
+              </Field>
+            </FieldGroup>
+          </form>
+        </CardContent>
+      </Card>
 
-      <div className='flex justify-center gap-2'>
-        <Button type='submit'>{form.id ? '수정 저장' : '저장하기'}</Button>
+      <div className='mt-8 flex justify-center gap-2'>
+        <Button
+          onClick={handleSubmit}
+          variant='default'
+        >
+          {form.addressId ? '수정' : '저장'}
+        </Button>
         <Button
           type='button'
           onClick={handleReset}
-          className='border border-black bg-white text-black hover:bg-gray-100'
+          variant='outline'
         >
-          초기화/취소
+          취소
         </Button>
       </div>
-    </form>
+    </>
   );
 }

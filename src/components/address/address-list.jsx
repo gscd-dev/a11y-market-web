@@ -1,41 +1,67 @@
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 export default function AddressList({ addresses = [], onEdit, onDelete }) {
   return (
-    <div className='rounded-md border border-gray-300 p-2'>
-      <div className='flex border-b border-gray-300 py-2 font-bold'>
-        <div className='flex-2'>배송지명</div>
-        <div className='flex-1'>수령인</div>
-        <div className='flex-3'>주소</div>
-        <div className='flex-2'>연락처</div>
-        <div className='flex-auto'>관리</div>
-      </div>
+    <Card>
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className='text-center font-bold'>배송지명</TableHead>
+              <TableHead className='text-center font-bold'>수령인</TableHead>
+              <TableHead className='text-center font-bold'>주소</TableHead>
+              <TableHead className='text-center font-bold'>연락처</TableHead>
+              <TableHead className='text-center font-bold'></TableHead>
+            </TableRow>
+          </TableHeader>
 
-      {addresses.map((addr) => (
-        <div
-          key={addr.id}
-          className='flex items-center border-b border-gray-200 py-2'
-        >
-          <div className='flex flex-2 flex-col'>
-            {addr.isDefault && <span className='text-blue-500'>[기본배송지]</span>}
-            <span>{addr.addressName}</span>
-          </div>
-          <div className='flex-1'>{addr.receiverName}</div>
-          <div className='flex-3'>
-            ({addr.zipcord}) {addr.address1} {addr.address2}
-          </div>
-          <div className='flex-2'>{addr.phone}</div>
-          <div className='flex gap-1'>
-            <Button onClick={() => onEdit && onEdit(addr)}>수정</Button>
-            <Button
-              onClick={() => onDelete && onDelete(addr.id)}
-              className='border border-black bg-white text-black hover:bg-gray-100'
-            >
-              삭제
-            </Button>
-          </div>
-        </div>
-      ))}
-    </div>
+          <TableBody>
+            {addresses.map((addr) => (
+              <TableRow key={addr.addressId}>
+                <TableCell className='px-4 py-4 text-center'>
+                  <div className='flex flex-2 flex-col'>
+                    {addr.isDefault && <span className='text-blue-500'>[기본배송지]</span>}
+                    <span>{addr.addressName}</span>
+                  </div>
+                </TableCell>
+                <TableCell className='px-4 py-4 text-center'>{addr.receiverName}</TableCell>
+                <TableCell className='px-4 py-4 text-left'>
+                  [{addr.receiverZipcode}]<br /> {addr.receiverAddr1}
+                  <br /> ({addr.receiverAddr2})
+                </TableCell>
+                <TableCell className='px-4 py-4 text-center'>{addr.receiverPhone}</TableCell>
+                <TableCell className='px-4 py-4 text-center'>
+                  <div className='flex gap-1'>
+                    <Button
+                      onClick={() => onEdit && onEdit(addr)}
+                      variant='default'
+                      className='font-bold'
+                    >
+                      수정
+                    </Button>
+                    <Button
+                      onClick={() => onDelete && onDelete(addr.addressId)}
+                      variant='outline'
+                      className='font-bold'
+                    >
+                      삭제
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }
