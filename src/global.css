@@ -223,7 +223,7 @@ html.a11y-contrast-low {
 }
 
 /* 색상 반전: CSS Filter 사용 */
-html.a11y-invert {
+html.a11y-contrast-invert {
   filter: invert(1) hue-rotate(180deg);
   background-color: oklch(1 0 0);
 }
