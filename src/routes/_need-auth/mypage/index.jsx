@@ -1,8 +1,9 @@
 import { userApi } from '@/api/user-api';
-import { A11ySetting } from '@/components/mypage/A11ySetting';
-import { AccountInfo } from '@/components/mypage/AccounInfo';
-import { AddressManager } from '@/components/mypage/AddressManager';
-import { OrderHistory } from '@/components/mypage/OrderHistory';
+import { A11ySetting } from '@/components/mypage/a11y-setting';
+import { AccountInfo } from '@/components/mypage/account-info';
+import { AddressManager } from '@/components/mypage/address-manager';
+import { OrderHistory } from '@/components/mypage/order-history';
+import { Widthdraw } from '@/components/mypage/widthdraw';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,6 +36,7 @@ function RouteComponent() {
     { label: '주문 내역', value: 'order', redirect: false },
     { label: '접근성 프로필', value: 'a11y', redirect: false },
     { label: '배송지 관리', value: 'address', redirect: false },
+    { label: '회원 탈퇴', value: 'withdraw', redirect: true },
   ];
 
   const { user, logout, isAuthenticated } = useSelector((state) => state.auth);
@@ -97,7 +99,7 @@ function RouteComponent() {
 
   return (
     <main
-      className='flex-1 bg-neutral-50 dark:bg-neutral-900'
+      className='font-kakao-big flex-1 bg-neutral-50 dark:bg-neutral-900'
       aria-label='마이페이지 내용 영역'
     >
       <div className='mx-auto mt-8 w-full max-w-6xl'>
@@ -206,6 +208,10 @@ function RouteComponent() {
 
               <TabsContent value='address'>
                 <AddressManager />
+              </TabsContent>
+
+              <TabsContent value='withdraw'>
+                <Widthdraw />
               </TabsContent>
             </div>
           </div>
