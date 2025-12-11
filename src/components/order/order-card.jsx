@@ -33,7 +33,12 @@ export default function OrderCard({ order }) {
           return (
             <Item
               key={item.orderItemId}
-              className='border-border space-y-2 rounded-lg border p-4'
+              className='border-border cursor-pointer space-y-2 rounded-lg border p-4 hover:shadow-md'
+              onClick={() => {
+                navigate({
+                  to: `/products/${item.productId}`,
+                });
+              }}
             >
               <ItemMedia>
                 <img
