@@ -20,7 +20,7 @@ import { ROLES } from '@/constants/roles';
 import { cn } from '@/lib/utils';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { FileText, LogOut, Store } from 'lucide-react';
+import { CircleX, FileText, LogOut, Scale, Store } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { toast } from 'sonner';
@@ -39,17 +39,20 @@ function RouteComponent() {
     { label: '회원 탈퇴', value: 'withdraw', redirect: true },
   ];
 
-  const { user, logout, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, logout } = useSelector((state) => state.auth);
 
   const [userInfo, setUserInfo] = useState({});
   const [activeTab, setActiveTab] = useState('info');
+  const [sellerSubmitStatus, setSellerSubmitStatus] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       const resp = await userApi.getProfile();
+
       setUserInfo(resp.data);
+      setSellerSubmitStatus(resp.data.sellerSubmitStatus);
     })();
   }, []);
 
@@ -93,6 +96,32 @@ function RouteComponent() {
           >
             일반 사용자
           </Badge>
+        );
+    }
+  };
+
+  const getSubmitStatusText = () => {
+    switch (sellerSubmitStatus) {
+      case 'PENDING':
+        return (
+          <>
+            <Scale className='size-4 transition-all duration-400 group-hover:size-5' />
+            <span>신청 심사 중</span>
+          </>
+        );
+      case 'REJECTED':
+        return (
+          <>
+            <CircleX className='size-4 text-red-500 transition-all duration-400 group-hover:size-5' />
+            <span>신청 거절됨</span>
+          </>
+        );
+      default:
+        return (
+          <>
+            <FileText className='size-4 transition-all duration-400 group-hover:size-5' />
+            <span>판매자 신청</span>
+          </>
         );
     }
   };
@@ -164,16 +193,16 @@ function RouteComponent() {
               </TabsList>
               {user?.userRole === ROLES.USER && (
                 <Button
+                  className='group w-full gap-2 shadow-md transition-all duration-400 hover:text-base md:h-12'
+                  variant='outline'
+                  disabled={!!sellerSubmitStatus}
                   onClick={() =>
                     navigate({
                       to: '/seller/apply',
                     })
                   }
-                  className='group w-full gap-2 shadow-md transition-all duration-400 hover:text-base md:h-12'
-                  variant='outline'
                 >
-                  <FileText className='size-4 transition-all duration-400 group-hover:size-5' />
-                  판매자 신청
+                  {getSubmitStatusText()}
                 </Button>
               )}
               {user?.userRole === ROLES.SELLER && (
