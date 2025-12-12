@@ -1,9 +1,9 @@
 import { sellerApi } from '@/api/seller-api';
 import { DashboardCard } from '@/components/seller/dashboard/dashbord-card';
 import { Button } from '@/components/ui/button';
-import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Item, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import { Link } from '@tanstack/react-router';
-import { ClipboardList } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
@@ -35,29 +35,50 @@ export const DashboardStatSection = () => {
 
   return (
     <section className='mb-4 flex flex-col gap-4'>
-      <Item
-        variant='outline'
-        className='my-4 rounded-xl p-8 shadow-sm transition-shadow hover:shadow-md'
-      >
-        <ItemContent>
-          <ItemTitle>
-            <h1 className='text-2xl'>{`${data.sellerName}`}</h1>
-          </ItemTitle>
-          <ItemDescription className='text-gray-600'>{user?.userEmail}</ItemDescription>
-        </ItemContent>
-        <ItemActions>
-          <Link to='/seller/products'>
+      <div className='flex flex-col gap-4 md:flex-row md:gap-4'>
+        <Item
+          variant='outline'
+          className='flex flex-2 rounded-xl p-8 shadow-sm transition-shadow hover:shadow-md'
+        >
+          <ItemContent>
+            <ItemTitle>
+              <h1 className='text-2xl'>{`${data.sellerName}`}</h1>
+            </ItemTitle>
+            <ItemDescription className='text-gray-600'>{user?.userEmail}</ItemDescription>
+          </ItemContent>
+        </Item>
+
+        <Card className='flex-1 rounded-2xl'>
+          <CardHeader>
+            <CardTitle className='text-base'>빠른 작업</CardTitle>
+          </CardHeader>
+          <CardContent className='grid gap-3'>
             <Button
+              asChild
+              className='w-full justify-start'
               variant='outline'
-              size='lg'
-              className='px-4 py-2 text-base font-bold transition-all hover:cursor-pointer hover:shadow-md'
             >
-              <ClipboardList className='size-6' />
-              상품 관리
+              <Link to='/seller/products/new'>상품 등록하기</Link>
             </Button>
-          </Link>
-        </ItemActions>
-      </Item>
+
+            <Button
+              asChild
+              className='w-full justify-start'
+              variant='outline'
+            >
+              <Link to='/seller/products'>내 상품 관리</Link>
+            </Button>
+
+            <Button
+              asChild
+              className='w-full justify-start'
+              variant='outline'
+            >
+              <Link to='/seller/claims'>취소/반품 관리</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
       <div className='grid gap-5 sm:grid-cols-2 lg:grid-cols-4'>
         <DashboardCard
           title='총 매출액'
