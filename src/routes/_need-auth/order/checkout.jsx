@@ -245,7 +245,7 @@ function orderCheckoutPage() {
                       </TableCell>
                       <TableCell className='text-center'>{item.quantity}</TableCell>
                       <TableCell className='text-center'>{`${item.productPrice?.toLocaleString('ko-KR')}원`}</TableCell>
-                      <TableCell className='text-center'>{`${item.productTotalPrice?.toLocaleString('ko-KR')}원`}</TableCell>
+                      <TableCell className='text-center'>{`${(item.productPrice * item.quantity)?.toLocaleString('ko-KR')}원`}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
