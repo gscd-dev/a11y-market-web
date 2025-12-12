@@ -1,3 +1,4 @@
+import { addressApi } from '@/api/address-api';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -9,18 +10,7 @@ import { useEffect, useState } from 'react';
 import DaumPostcodeEmbed from 'react-daum-postcode';
 import { toast } from 'sonner';
 
-const EMPTY_FORM = {
-  addressId: undefined,
-  addressName: '',
-  receiverName: '',
-  receiverZipcode: '',
-  receiverAddr1: '',
-  receiverAddr2: '',
-  receiverPhone: '',
-  isDefault: false,
-};
-
-export const NewAddressForm = ({ mode, initialForm = null }) => {
+export const NewAddressForm = ({ mode, initialForm = null, onSave, onCancel }) => {
   const [isAddressDialogOpen, setIsAddressDialogOpen] = useState(false);
   const [formattedPhone, setFormattedPhone] = useState('');
   const [formData, setFormData] = useState({
@@ -34,7 +24,6 @@ export const NewAddressForm = ({ mode, initialForm = null }) => {
   });
 
   useEffect(() => {
-    console.log('initialForm', initialForm);
     if (initialForm) {
       setFormData({
         addressId: initialForm.addressId,
@@ -91,13 +80,15 @@ export const NewAddressForm = ({ mode, initialForm = null }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Submitting form data:', formData);
     try {
       if (mode === 'add') {
-        await addressApi.createAddress(formData.addressId, formData);
+        await addressApi.createAddress(formData);
       } else {
         await addressApi.updateAddress(formData.addressId, formData);
       }
       toast.success('배송지를 저장했습니다.');
+      onSave();
     } catch (err) {
       console.error('배송지 저장 실패:', err);
       toast.error(err.message || '배송지 저장에 실패했습니다.');
@@ -251,6 +242,7 @@ export const NewAddressForm = ({ mode, initialForm = null }) => {
               variant='outline'
               type='reset'
               aria-label='배송지 수정 취소 버튼'
+              onClick={onCancel}
             >
               취소
             </Button>
