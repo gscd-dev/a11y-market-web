@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { statusLabel } from '@/constants/order-item-status';
 import { useNavigate } from '@tanstack/react-router';
 import { ClipboardList } from 'lucide-react';
+import { ImageWithFallback } from '../image-with-fallback';
 import { Button } from '../ui/button';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemMedia, ItemTitle } from '../ui/item';
 
@@ -36,7 +37,7 @@ export default function OrderCard({ order }) {
               className='border-border cursor-pointer space-y-2 rounded-lg border p-4 hover:shadow-md'
             >
               <ItemMedia>
-                <img
+                <ImageWithFallback
                   src={item.productImageUrl}
                   alt={item.productName}
                   className='aspect-3/2 h-16 rounded-md object-cover'
