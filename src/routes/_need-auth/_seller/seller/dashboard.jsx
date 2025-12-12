@@ -24,6 +24,7 @@ function SellerDashboardPage() {
 
       {/* 요약 카드 */}
       <DashboardStatSection />
+
       {/* 기간 필터 + 매출 추이 차트 */}
       <DashboardDailyRevenue />
 

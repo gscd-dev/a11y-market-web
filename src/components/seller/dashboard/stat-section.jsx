@@ -30,7 +30,7 @@ export const DashboardStatSection = () => {
   }, []);
 
   const format = (num) => {
-    return num.toLocaleString();
+    return num?.toLocaleString() || '0';
   };
 
   return (
@@ -90,11 +90,11 @@ export const DashboardStatSection = () => {
         />
         <DashboardCard
           title='구매 확정률'
-          value={`${data.confirmedRate.toFixed(2)}%`}
+          value={`${data.confirmedRate?.toFixed(2) || '0'}%`}
         />
         <DashboardCard
           title='취소/환불 비율'
-          value={`${data.refundRate.toFixed(2)}%`}
+          value={`${data.refundRate?.toFixed(2) || '0'}%`}
         />
       </div>
     </section>
