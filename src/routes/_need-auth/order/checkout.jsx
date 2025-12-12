@@ -132,7 +132,7 @@ function orderCheckoutPage() {
         cartItemIds: type === 'CART' ? currentCartItemIds : null,
         directOrderItem:
           type === 'DIRECT'
-            ? { productId: orderItems[0].productId, quantity: orderItems[0].productQuantity }
+            ? { productId: orderItems[0].productId, quantity: orderItems[0].quantity }
             : null,
       });
 
