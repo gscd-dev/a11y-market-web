@@ -181,4 +181,6 @@ export const sellerApi = {
     await axiosInstance.patch(`/v1/seller/products/${productId}/stock`, { productStock: newStock }),
 
   updateSellerInfo: async (data) => await axiosInstance.put('/v1/seller/me', data),
+
+  getOrderSummary: async () => await axiosInstance.get('/v1/seller/orders/summary'),
 };

@@ -60,6 +60,13 @@ function SellerOrdersPage() {
   // const [keyword, setKeyword] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [page, setPage] = useState(1);
+  const [orderSummary, setOrderSummary] = useState({
+    newOrders: 0,
+    acceptedOrders: 0,
+    shippingOrders: 0,
+    completedOrders: 0,
+    claimedOrders: 0,
+  });
 
   const navigate = useNavigate();
 
@@ -75,16 +82,15 @@ function SellerOrdersPage() {
 
         setTotalOrderCount(totalOrderCount);
         setOrderData(orderItems);
+
+        const summaryResp = await sellerApi.getOrderSummary();
+        console.log('Order Summary:', summaryResp.data);
+        setOrderSummary((prev) => ({ ...prev, ...summaryResp.data }));
       } catch (err) {
         console.error('Failed to fetch received orders:', err);
       }
     })();
   }, [page, statusFilter]);
-
-  const newOrderCount = orderData.filter((o) => o.orderItemStatus === 'PAID').length;
-  const preparingCount = orderData.filter((o) => o.orderItemStatus === 'ACCEPTED').length;
-  const shippingCount = orderData.filter((o) => o.orderItemStatus === 'SHIPPED').length;
-  const completedCount = orderData.filter((o) => o.orderItemStatus === 'CONFIRMED').length;
 
   const handleShippingSubmit = async (e) => {
     e.preventDefault();
@@ -114,11 +120,11 @@ function SellerOrdersPage() {
   };
 
   return (
-    <div className='mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6'>
+    <main className='font-kakao-big mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6'>
       {/* 헤더 */}
       <header className='flex flex-col justify-between gap-4 md:flex-row md:items-center'>
         <div className='space-y-1'>
-          <h1 className='font-kakao-big text-2xl'>주문 접수 / 배송 처리</h1>
+          <h1 className='font-kakao-big text-2xl'>주문 접수 및 관리 </h1>
           <p className='font-kakao-little text-sm'>
             접수된 주문을 확인하고, 상품 준비 및 배송 정보를 관리할 수 있습니다.
           </p>
@@ -145,25 +151,30 @@ function SellerOrdersPage() {
       </header>
 
       {/* 상단 요약 카드 */}
-      <section className='grid gap-4 md:grid-cols-4'>
+      <section className='grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
         <OrderSummaryCard
           label='신규 주문'
-          value={newOrderCount}
+          value={orderSummary.newOrders}
           description='주문접수 상태의 주문 수'
         />
         <OrderSummaryCard
-          label='상품 준비 중'
-          value={preparingCount}
+          label='주문 접수됨'
+          value={orderSummary.acceptedOrders}
           description='포장/출고 준비 중인 주문 수'
         />
         <OrderSummaryCard
           label='배송 중'
-          value={shippingCount}
+          value={orderSummary.shippingOrders}
           description='택배사에 전달된 배송 건'
         />
         <OrderSummaryCard
           label='배송 완료'
-          value={completedCount}
+          value={orderSummary.completedOrders}
+          description='배송이 완료된 주문 수'
+        />
+        <OrderSummaryCard
+          label='취소/반품 요청'
+          value={orderSummary.claimedOrders}
           description='배송이 완료된 주문 수'
         />
       </section>
@@ -611,7 +622,7 @@ function SellerOrdersPage() {
           </div>
         </section>
       )}
-    </div>
+    </main>
   );
 }
 
