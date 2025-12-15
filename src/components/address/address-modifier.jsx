@@ -78,6 +78,7 @@ export const AddressModifier = ({ mode, onChange, className = '', variant = 'out
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       if (mode === 'add') {
         await addressApi.createAddress(formData);
@@ -99,7 +100,7 @@ export const AddressModifier = ({ mode, onChange, className = '', variant = 'out
       open={isModifierDialogOpen}
       onOpenChange={setIsModifierDialogOpen}
     >
-      <form onSubmit={handleSubmit}>
+      <form>
         <DialogTrigger asChild>
           <Button
             className={cn(
@@ -248,6 +249,7 @@ export const AddressModifier = ({ mode, onChange, className = '', variant = 'out
                   variant='default'
                   className='mt-4'
                   type='submit'
+                  onClick={handleSubmit}
                   aria-label={mode === 'add' ? '배송지 추가 버튼' : '배송지 수정 버튼'}
                 >
                   {mode === 'add' ? '추가하기' : '수정하기'}
