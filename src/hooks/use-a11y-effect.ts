@@ -9,8 +9,8 @@ import {
   A11yTextSizeClass,
   A11yTextSpacingClass,
 } from '@/lib/a11y/a11yEnums';
+import { useA11yData } from '@/store/a11y-store';
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
 
 export const useA11yEffect = () => {
   const {
@@ -23,13 +23,13 @@ export const useA11yEffect = () => {
     highlightLinks,
     cursorHighlight,
     screenReader,
-  } = useSelector((state) => state.a11y);
+  } = useA11yData();
 
   useEffect(() => {
     const root = document.documentElement;
     const classList = root.classList;
 
-    const removeClasses = (prefix) => {
+    const removeClasses = (prefix: string) => {
       Array.from(classList).forEach((cls) => {
         if (cls.startsWith(prefix) || cls === 'dark') {
           classList.remove(cls);
@@ -81,7 +81,7 @@ export const useA11yEffect = () => {
       return;
     }
 
-    const speak = (text) => {
+    const speak = (text: string) => {
       if (!text || text.trim().length === 0) return;
 
       window.speechSynthesis.cancel();
@@ -91,8 +91,8 @@ export const useA11yEffect = () => {
       window.speechSynthesis.speak(utterance);
     };
 
-    const handleInteraction = (e) => {
-      let target = e.target;
+    const handleInteraction = (e: FocusEvent) => {
+      let target = e.target as HTMLElement | null;
       if (!target) return;
 
       if (target.nodeType === Node.TEXT_NODE) {
@@ -109,22 +109,28 @@ export const useA11yEffect = () => {
 
       let textToRead = '';
       const ariaLabel = elementToRead.getAttribute('aria-label');
+      const role = elementToRead.getAttribute('role');
 
       if (ariaLabel) {
         textToRead = ariaLabel;
       } else if (elementToRead.getAttribute('aria-labelledby')) {
         const id = elementToRead.getAttribute('aria-labelledby');
+        if (!id) return;
+
         const labelledElement = document.getElementById(id);
         if (labelledElement) {
           textToRead = labelledElement.innerText;
         }
       } else if (role === 'option') {
-        textToRead = elementToRead.innerText;
+        textToRead = (elementToRead as HTMLElement).innerText;
       } else {
         if (elementToRead.tagName === 'IMG') {
           textToRead = elementToRead.getAttribute('alt') || '';
         } else {
-          textToRead = elementToRead.innerText || elementToRead.value || '';
+          textToRead =
+            (elementToRead as HTMLElement).innerText ||
+            (elementToRead as HTMLInputElement).value ||
+            '';
         }
       }
 

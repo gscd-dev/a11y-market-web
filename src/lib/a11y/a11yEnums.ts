@@ -7,7 +7,7 @@ export const A11yContrast = {
   LOW: 4,
 };
 
-export const A11yContrastClass = (contrastLevel) => {
+export const A11yContrastClass = (contrastLevel: number) => {
   switch (contrastLevel) {
     case A11yContrast.INVERT:
       return 'a11y-contrast-invert';
@@ -29,7 +29,7 @@ export const A11yTextSize = {
   LARGER: 2,
 };
 
-export const A11yTextSizeClass = (textSizeLevel) => {
+export const A11yTextSizeClass = (textSizeLevel: number) => {
   if (textSizeLevel !== A11yTextSize.NORMAL) {
     return `a11y-text-size-${textSizeLevel}`;
   }
@@ -43,7 +43,7 @@ export const A11yTextSpacing = {
   WIDER: 2,
 };
 
-export const A11yTextSpacingClass = (textSpacingLevel) => {
+export const A11yTextSpacingClass = (textSpacingLevel: number) => {
   if (textSpacingLevel !== A11yTextSpacing.NORMAL) {
     return `a11y-spacing-${textSpacingLevel}`;
   }
@@ -57,7 +57,7 @@ export const A11yLineHeight = {
   WIDER: 2,
 };
 
-export const A11yLineHeightClass = (lineHeightLevel) => {
+export const A11yLineHeightClass = (lineHeightLevel: number) => {
   if (lineHeightLevel !== A11yLineHeight.NORMAL) {
     return `a11y-leading-${lineHeightLevel}`;
   }
@@ -68,7 +68,7 @@ export const A11yTextAlign = {
   LEFT: 'left',
   CENTER: 'center',
   RIGHT: 'right',
-  getA11yTextAlignStep: (align) => {
+  getA11yTextAlignStep: (align: string) => {
     switch (align) {
       case 'center':
         return 1;
@@ -80,21 +80,21 @@ export const A11yTextAlign = {
   },
 };
 
-export const A11yTextAlignClass = (textAlign) => {
+export const A11yTextAlignClass = (textAlign: string) => {
   if (textAlign !== A11yTextAlign.LEFT) {
     return `a11y-align-${textAlign}`;
   }
   return '';
 };
 
-export const A11ySmartContrastClass = (smartContrast) => {
+export const A11ySmartContrastClass = (smartContrast: boolean) => {
   return smartContrast ? 'a11y-smart-contrast' : '';
 };
 
-export const A11yLinkHighlightClass = (highlightLinks) => {
+export const A11yLinkHighlightClass = (highlightLinks: boolean) => {
   return highlightLinks ? 'a11y-link-highlight' : '';
 };
 
-export const A11yCursorHighlightClass = (cursorHighlight) => {
+export const A11yCursorHighlightClass = (cursorHighlight: boolean) => {
   return cursorHighlight ? 'a11y-cursor-highlight' : '';
 };

@@ -1,7 +1,13 @@
 import { mainApi } from '@/api/main-api';
 import { Button } from '@/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import type { MonthlyPopularProduct } from '@/types/main-page';
 import { Icon } from '@iconify/react';
 import { useNavigate } from '@tanstack/react-router';
 import { TrendingUp } from 'lucide-react';
@@ -11,20 +17,14 @@ import { ProductCard } from './product-card';
 export function PopularRanking() {
   const navigate = useNavigate();
 
-  const [carouselApi, setCarouselApi] = useState();
-  const [error, setError] = useState(null);
-  const [data, setData] = useState([]);
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [data, setData] = useState<MonthlyPopularProduct[]>([]);
 
   useEffect(() => {
     // Fetch popular items from the API
     const fetchPopularItems = async () => {
-      try {
-        const resp = await mainApi.getPopularItems();
-        setData(resp.data);
-      } catch (error) {
-        console.error('Failed to fetch popular items:', error);
-        setError('인기 상품을 불러오는 데 실패했습니다.');
-      }
+      const data = await mainApi.getPopularItems();
+      setData(data);
     };
 
     fetchPopularItems();
@@ -99,7 +99,7 @@ export function PopularRanking() {
           onClick={() => {
             navigate({
               to: '/products',
-              search: (old) => ({ ...old, sort: 'popular' }),
+              search: (old: URLSearchParams) => ({ ...old, sort: 'popular' }),
             });
           }}
         >

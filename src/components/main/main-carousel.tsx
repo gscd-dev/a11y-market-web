@@ -1,13 +1,19 @@
 import { mainApi } from '@/api/main-api';
 import { Button } from '@/components/ui/button';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from '@/components/ui/carousel';
 import { cn } from '@/lib/utils';
+import type { EventBanner } from '@/types/main-page';
 import { useNavigate } from '@tanstack/react-router';
 import Autoplay from 'embla-carousel-autoplay';
 import Fade from 'embla-carousel-fade';
 import { ChevronLeftIcon, ChevronRightIcon, Pause, Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ImageWithFallback } from '../image-with-fallback';
-import { Carousel, CarouselContent, CarouselItem } from '../ui/carousel';
 import { LoadingEmpty } from './loading-empty';
 
 export const MainCarousel = () => {
@@ -16,12 +22,12 @@ export const MainCarousel = () => {
 
   const navigate = useNavigate();
 
-  const [api, setApi] = useState();
-  const [current, setCurrent] = useState(0);
-  const [count, setCount] = useState(0);
-  const [isAutoPlay, setIsAutoPlay] = useState(true);
-  const [bannerData, setBannerData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [api, setApi] = useState<CarouselApi>();
+  const [current, setCurrent] = useState<number>(0);
+  const [count, setCount] = useState<number>(0);
+  const [isAutoPlay, setIsAutoPlay] = useState<boolean>(true);
+  const [bannerData, setBannerData] = useState<EventBanner[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (!api) return;
@@ -38,8 +44,8 @@ export const MainCarousel = () => {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        const response = await mainApi.getEventBanners();
-        setBannerData(response.data);
+        const data = await mainApi.getEventBanners();
+        setBannerData(data);
       } catch (error) {
         console.error('배너 데이터를 불러오는 중 오류 발생:', error);
       } finally {
@@ -53,13 +59,13 @@ export const MainCarousel = () => {
   const apiButtonStyles =
     'absolute opacity-80 top-1/2 size-12 -translate-y-1/2 rounded-full bg-neutral-50 text-neutral-700 shadow-lg hover:opacity-100 hover:bg-white dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-500';
 
-  const handleBannerClick = (url) => {
+  const handleBannerClick = (url: string) => {
     navigate({
       to: url,
     });
   };
 
-  const handleDotClick = (index) => {
+  const handleDotClick = (index: number) => {
     api?.scrollTo(index);
   };
 

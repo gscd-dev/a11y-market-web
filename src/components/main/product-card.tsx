@@ -1,15 +1,21 @@
+import { AddCartButton } from '@/components/cart/add-cart-button';
 import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Badge } from '@/components/ui/badge';
+import type { MonthlyPopularProduct } from '@/types/main-page';
+import type { Product, SimpleProductInfo } from '@/types/product';
 import { Link } from '@tanstack/react-router';
-import { AddCartButton } from '../cart/add-cart-button';
 
-export const ProductCard = ({ product }) => {
+interface ProductCardProps {
+  product: SimpleProductInfo | Product | MonthlyPopularProduct;
+}
+
+export const ProductCard = ({ product }: ProductCardProps) => {
   const formattedPrice = product.productPrice.toLocaleString('ko-KR');
 
   const getImageUrl = () => {
-    if (product.productImages && product.productImages.length > 0) {
+    if ('productImages' in product && product.productImages.length > 0) {
       return product.productImages.filter((img) => img.imageSequence === 0)[0]?.imageUrl || '';
-    } else if (product.productImageUrl) {
+    } else if ('productImageUrl' in product) {
       return product.productImageUrl;
     } else {
       return ''; // Fallback
@@ -28,7 +34,7 @@ export const ProductCard = ({ product }) => {
             alt={product.productName}
             className='size-full object-cover transition-transform duration-300 group-hover:scale-105'
           />
-          {product.ranking && (
+          {'ranking' in product && product.ranking && (
             <Badge
               className='absolute top-2 left-2 bg-red-500 text-white'
               aria-label={`인기 순위 ${product.ranking}`}
