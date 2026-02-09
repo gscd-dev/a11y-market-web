@@ -1,6 +1,11 @@
 import { HeartPlus, Laptop, Package, Shirt, Utensils } from 'lucide-react';
 
-export const IconMap = ({ categoryName, className }) => {
+interface IconMapProps {
+  categoryName: string | null;
+  className?: string;
+}
+
+export const IconMap = ({ categoryName, className }: IconMapProps) => {
   if (categoryName == null) {
     return <Package className={className} />;
   }

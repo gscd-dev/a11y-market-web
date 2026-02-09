@@ -5,15 +5,14 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from '@/components/ui/empty';
-import { Icon } from '@iconify/react';
+import { Spinner } from '../ui/spinner';
 
 export const LoadingEmpty = () => {
   return (
     <Empty>
       <EmptyHeader>
         <EmptyMedia variant='icon'>
-          <Icon
-            icon='svg-spinners:90-ring-with-bg'
+          <Spinner 
             className='size-16'
           />
         </EmptyMedia>

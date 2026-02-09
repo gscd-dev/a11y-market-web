@@ -1,15 +1,15 @@
 import { mainApi } from '@/api/main-api';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { IconMap } from '@/lib/category-icon-mapping';
-import { TabsContent } from '@radix-ui/react-tabs';
+import type { Product } from '@/types/product';
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { ProductCard } from './product-card';
 
 export function CategoryView() {
   const navigate = useNavigate();
-  const [itemList, setItemList] = useState([]);
+  const [itemList, setItemList] = useState<Product[]>([]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -24,9 +24,11 @@ export function CategoryView() {
     fetchCategories();
   }, []);
 
-  const handleSelectCategory = (categoryId) => {
-    const filteredProducts = itemList.filter((product) => product.categoryId === categoryId);
-    setProductList(filteredProducts);
+  const handleSelectCategory = (categoryId: string) => {
+    const filteredProducts = itemList.filter(
+      (product: Product) => product.categoryId === categoryId,
+    );
+    setItemList(filteredProducts);
   };
 
   if (!itemList || itemList.length === 0) {

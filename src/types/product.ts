@@ -5,7 +5,14 @@ interface ProductImage {
   imageSequence: number;
 }
 
-export interface Product {
+export interface SimpleProductInfo {
+  productId: string;
+  productName: string;
+  productPrice: number;
+  productImageUrl: string;
+}
+
+export interface Product extends SimpleProductInfo {
   productId: string;
   productName: string;
   productDescription: string;

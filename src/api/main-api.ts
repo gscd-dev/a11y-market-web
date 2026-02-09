@@ -1,62 +1,72 @@
+import type {
+  CategoryRecommendResponse,
+  EventBanner,
+  MonthlyPopularProduct,
+} from '@/types/main-page';
+import { toast } from 'sonner';
 import axiosInstance from './axios-instance';
 
 export const mainApi = {
-  getEventBanners: async () => {
+  getEventBanners: async (): Promise<EventBanner[]> => {
     try {
-      const resp = await axiosInstance.get('/v1/main/events');
+      const { status, data } = await axiosInstance.get('/v1/main/events');
 
-      if (resp.status !== 200) {
+      if (status !== 200) {
         throw new Error('이벤트 배너 조회에 실패했습니다.');
       }
 
-      return resp;
+      return data;
     } catch (err) {
       console.error('Error during getEventBanners:', err);
+      toast.error('이벤트 배너를 불러오는 중 오류가 발생했습니다.');
       return Promise.reject(err);
     }
   },
 
-  getPopularItems: async () => {
+  getPopularItems: async (): Promise<MonthlyPopularProduct[]> => {
     try {
-      const resp = await axiosInstance.get('/v1/main/products/populars');
+      const { status, data } = await axiosInstance.get('/v1/main/products/populars');
 
-      if (resp.status !== 200) {
+      if (status !== 200) {
         throw new Error('인기 상품 조회에 실패했습니다.');
       }
 
-      return resp;
+      return data;
     } catch (err) {
       console.error('Error during getPopularItems:', err);
+      toast.error('인기 상품을 불러오는 중 오류가 발생했습니다.');
       return Promise.reject(err);
     }
   },
 
-  getCategories: async () => {
+  getCategories: async (): Promise<CategoryRecommendResponse> => {
     try {
-      const resp = await axiosInstance.get('/v1/main/products/categories');
+      const { status, data } = await axiosInstance.get('/v1/main/products/categories');
 
-      if (resp.status !== 200) {
+      if (status !== 200) {
         throw new Error('카테고리 조회에 실패했습니다.');
       }
 
-      return resp;
+      return data;
     } catch (err) {
       console.error('Error during getCategories:', err);
+      toast.error('카테고리를 불러오는 중 오류가 발생했습니다.');
       return Promise.reject(err);
     }
   },
 
-  getProductsByCategory: async (categoryId) => {
+  getProductsByCategory: async (categoryId: string): Promise<CategoryRecommendResponse> => {
     try {
-      const resp = await axiosInstance.get(`/v1/categories/${categoryId}/products`);
+      const { status, data } = await axiosInstance.get(`/v1/categories/${categoryId}/products`);
 
-      if (resp.status !== 200) {
+      if (status !== 200) {
         throw new Error('카테고리별 상품 조회에 실패했습니다.');
       }
 
-      return resp;
+      return data;
     } catch (err) {
       console.error('Error during getProductsByCategory:', err);
+      toast.error('카테고리별 상품을 불러오는 중 오류가 발생했습니다.');
       return Promise.reject(err);
     }
   },
