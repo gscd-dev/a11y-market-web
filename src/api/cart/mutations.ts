@@ -1,6 +1,6 @@
-import { cartApi } from '@/api/cart-api';
-import { CART_KEYS } from '@/queries/keys';
-import type { AddCartItemRequest } from '@/types/cart';
+import { cartApi } from '@/api/cart';
+import { CART_KEYS } from '@/api/cart/keys';
+import type { AddCartItemRequest } from '@/api/cart/types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 

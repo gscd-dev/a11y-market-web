@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = err.config as CustomAxiosRequestConfig;
 
     // Zustand Actions 가져오기
-    const { logout, tokenRefresh } = useAuthActions();
+    const { logout, setToken } = useAuthActions();
 
     if (err.response?.status === 403 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -53,16 +53,13 @@ axiosInstance.interceptors.response.use(
           throw new Error('No refresh token available');
         }
 
-        const response = await axios.post(
-          `${API_BASE_URL}/api/auth/refresh`,
-          {refreshToken}
-        );
+        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, { refreshToken });
 
         const { accessToken, refreshToken: newRefreshToken } = response.data;
 
         // Zustand 상태 업데이트
-        tokenRefresh(accessToken);
-        
+        setToken(accessToken, newRefreshToken);
+
         if (newRefreshToken) {
           localStorage.setItem('refreshToken', newRefreshToken);
         }
@@ -77,7 +74,7 @@ axiosInstance.interceptors.response.use(
         logout();
 
         // 리다이렉트 처리
-        (useNavigate())({ to: '/login' });
+        useNavigate()({ to: '/login' });
 
         // 원래의 에러 반환
         return Promise.reject(err);

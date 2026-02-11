@@ -1,6 +1,6 @@
 import axiosInstance from '@/api/axios-instance';
+import type { User } from '@/api/user/types';
 import { useAuthStore } from '@/store/auth-store';
-import type { User } from '@/types/user';
 import { useQuery } from '@tanstack/react-query';
 
 export const useUser = () => {

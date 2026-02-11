@@ -1,0 +1,53 @@
+import { adminApi } from '@/api/admin';
+import { ADMIN_KEYS } from '@/api/admin/keys';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+
+export const useUpdateProductStatus = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ productId, status }: { productId: string; status: string }) =>
+      adminApi.updateProductStatus(productId, status),
+    onSuccess: () => {
+      toast.success('상품 상태가 변경되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.pendingProducts() });
+    },
+    onError: (error) => {
+      console.error('Failed to update product status:', error);
+      toast.error('상품 상태 변경에 실패했습니다.');
+    },
+  });
+};
+
+export const useApproveSeller = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sellerId: string) => adminApi.approveSeller(sellerId),
+    onSuccess: () => {
+      toast.success('판매자가 승인되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.pendingSellers() });
+    },
+    onError: (error) => {
+      console.error('Failed to approve seller:', error);
+      toast.error('판매자 승인에 실패했습니다.');
+    },
+  });
+};
+
+export const useRejectSeller = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sellerId: string) => adminApi.rejectSeller(sellerId),
+    onSuccess: () => {
+      toast.success('판매자가 거절되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ADMIN_KEYS.pendingSellers() });
+    },
+    onError: (error) => {
+      console.error('Failed to reject seller:', error);
+      toast.error('판매자 거절에 실패했습니다.');
+    },
+  });
+};
