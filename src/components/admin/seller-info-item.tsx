@@ -1,5 +1,5 @@
-import { adminApi } from '@/api/admin';
-import type { Seller } from '@/api/admin/types';
+import { useUpdateSellerInfo } from '@/api/admin/mutations';
+import type { Seller } from '@/api/seller/types';
 import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/components/ui/item';
 import {
   Select,
@@ -33,6 +33,8 @@ export const SellerInfoItem = ({ seller, ...props }: SellerInfoItemProps) => {
   const [isA11yGuarantee, setIsA11yGuarantee] = useState(seller.isA11yGuarantee);
   const [isUpdating, setIsUpdating] = useState(false);
 
+  const updateSellerInfo = useUpdateSellerInfo();
+
   const initialSellerInfo = {
     sellerName: seller.sellerName,
     businessNumber: seller.businessNumber,
@@ -49,44 +51,36 @@ export const SellerInfoItem = ({ seller, ...props }: SellerInfoItemProps) => {
 
   const handleChangeGrade = async (newGrade: 'NEWER' | 'REGULAR' | 'TRUSTED') => {
     setIsUpdating(true);
-    try {
-      const resp = await adminApi.updateSellerInfo(seller.sellerId, {
+
+    await updateSellerInfo.mutateAsync({
+      sellerId: seller.sellerId,
+      sellerInfo: {
         ...initialSellerInfo,
         sellerGrade: newGrade,
-      });
+      },
+    });
 
-      if (resp.status !== 204) {
-        throw new Error('Failed to update seller grade');
-      }
+    toast.success('판매자 등급이 변경되었습니다.');
 
-      setGrade(newGrade);
-    } catch (err) {
-      console.error('Error updating seller grade:', err);
-      toast.error('판매자 등급 업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setIsUpdating(false);
-    }
+    setGrade(newGrade);
+    setIsUpdating(false);
   };
 
   const handleChangeA11yGuarantee = async () => {
     setIsUpdating(true);
-    try {
-      const resp = await adminApi.updateSellerInfo(seller.sellerId, {
+
+    await updateSellerInfo.mutateAsync({
+      sellerId: seller.sellerId,
+      sellerInfo: {
         ...initialSellerInfo,
         a11yGuarantee: !seller.isA11yGuarantee,
-      });
+      },
+    });
 
-      if (resp.status !== 204) {
-        throw new Error('Failed to update accessibility guarantee status');
-      }
+    toast.success('접근성 인증 상태가 변경되었습니다.');
 
-      setIsA11yGuarantee(!isA11yGuarantee);
-    } catch (err) {
-      console.error('Error updating accessibility guarantee status:', err);
-      toast.error('접근성 인증 상태 업데이트 중 오류가 발생했습니다.');
-    } finally {
-      setIsUpdating(false);
-    }
+    setIsA11yGuarantee(!isA11yGuarantee);
+    setIsUpdating(false);
   };
 
   return (

@@ -1,9 +1,9 @@
+import { useAddCartItem } from '@/api/cart/mutations';
+import type { MonthlyPopularProduct } from '@/api/main/types';
+import type { Product, SimpleProductInfo } from '@/api/product/types';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { useAddCartItem } from '@/hooks/use-cart-mutation';
 import { cn } from '@/lib/utils';
-import type { MonthlyPopularProduct } from '@/types/main-page';
-import type { Product, SimpleProductInfo } from '@/types/product';
 import { CircleCheck, ShoppingCart } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';

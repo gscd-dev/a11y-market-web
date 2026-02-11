@@ -1,4 +1,4 @@
-import { adminApi } from '@/api/admin';
+import { useUpdateProductStatus } from '@/api/admin/mutations';
 import type { Product, ProductStatus } from '@/api/product/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,9 +37,14 @@ interface ProductRowSheetProps {
 export const ProductRowSheet = ({ product, onStatusChange }: ProductRowSheetProps) => {
   const [productStatus, setProductStatus] = useState<ProductStatus>(product.productStatus);
 
+  const updateProductStatus = useUpdateProductStatus();
+
   const handleStatusChange = async () => {
     try {
-      await adminApi.updateProductStatus(product.productId, productStatus);
+      await updateProductStatus.mutateAsync({
+        productId: product.productId,
+        status: productStatus,
+      });
 
       onStatusChange && onStatusChange(product.productId, productStatus);
       toast.success('상품 상태가 성공적으로 업데이트되었습니다.');
@@ -59,11 +64,6 @@ export const ProductRowSheet = ({ product, onStatusChange }: ProductRowSheetProp
         <Button
           variant='default'
           className='font-medium'
-          // href prop removed as Button might not support it directly or it's for Link behavior.
-          // If it was supposed to be a Link, it should be wrapped or use 'asChild' with Link.
-          // However, in the original code it was just a Button with href (which is invalid for shadcn Button usually unless it's an anchor).
-          // But here it is a trigger for Sheet, so it shouldn't navigate.
-          // I will remove href.
         >
           상세정보 보기
         </Button>
