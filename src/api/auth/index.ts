@@ -1,13 +1,13 @@
 import axiosInstance from '@/api/axios-instance';
 import { useAuthActions } from '@/store/auth-store';
+import { toast } from 'sonner';
 import type {
   CheckExistsResponse,
   JoinRequest,
   KakaoJoinRequest,
   LoginRequest,
   LoginResponse,
-} from '@/types/auth';
-import { toast } from 'sonner';
+} from './types';
 
 export const authApi = {
   login: async ({ email, password }: LoginRequest): Promise<void> => {
@@ -23,12 +23,12 @@ export const authApi = {
 
       const { accessToken, refreshToken } = data;
 
-      useAuthActions().loginSucess(accessToken, refreshToken);
+      useAuthActions().setToken(accessToken, refreshToken);
       toast.success('로그인에 성공했습니다.');
     } catch (err) {
       console.error('Error during login:', err);
       toast.error('로그인에 실패했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -45,7 +45,7 @@ export const authApi = {
     } catch (err) {
       console.error('Error during logout:', err);
       toast.error('로그아웃 도중 오류가 발생했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -61,7 +61,7 @@ export const authApi = {
     } catch (err) {
       console.error('Error during join:', err);
       toast.error('회원가입에 실패했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -81,7 +81,7 @@ export const authApi = {
     } catch (err) {
       console.error('Error during kakaoJoin:', err);
       toast.error('카카오 회원가입에 실패했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -97,12 +97,10 @@ export const authApi = {
         throw new Error('사용자 정보 조회에 실패했습니다.');
       }
 
-      toast.success('사용자 정보 조회에 성공했습니다.');
-
       return data;
     } catch (err) {
       console.error('Error during getUserInfo:', err);
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -122,7 +120,7 @@ export const authApi = {
       return data.isAvailable;
     } catch (err) {
       console.error('Error during checkEmailExists:', err);
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -142,7 +140,7 @@ export const authApi = {
       return data.isAvailable;
     } catch (err) {
       console.error('Error during checkNicknameExists:', err);
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -162,7 +160,7 @@ export const authApi = {
       return data.isAvailable;
     } catch (err) {
       console.error('Error during checkPhoneExists:', err);
-      return Promise.reject(err);
+      throw err;
     }
   },
 };

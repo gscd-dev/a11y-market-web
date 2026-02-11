@@ -4,7 +4,7 @@ import type {
   CartItemResponse,
   CartItemUpdateResponse,
   UpdateCartItemRequest,
-} from '@/types/cart';
+} from './types';
 
 export const cartApi = {
   getCartItems: async (): Promise<CartItemResponse> => {

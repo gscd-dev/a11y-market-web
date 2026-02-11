@@ -1,10 +1,6 @@
-import type {
-  CategoryRecommendResponse,
-  EventBanner,
-  MonthlyPopularProduct,
-} from '@/types/main-page';
+import axiosInstance from '@/api/axios-instance';
 import { toast } from 'sonner';
-import axiosInstance from './axios-instance';
+import type { CategoryRecommendResponse, EventBanner, MonthlyPopularProduct } from './types';
 
 export const mainApi = {
   getEventBanners: async (): Promise<EventBanner[]> => {
@@ -19,7 +15,7 @@ export const mainApi = {
     } catch (err) {
       console.error('Error during getEventBanners:', err);
       toast.error('이벤트 배너를 불러오는 중 오류가 발생했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -35,13 +31,15 @@ export const mainApi = {
     } catch (err) {
       console.error('Error during getPopularItems:', err);
       toast.error('인기 상품을 불러오는 중 오류가 발생했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
-  getCategories: async (): Promise<CategoryRecommendResponse> => {
+  getCategories: async (): Promise<CategoryRecommendResponse[]> => {
     try {
-      const { status, data } = await axiosInstance.get('/v1/main/products/categories');
+      const { status, data } = await axiosInstance.get<CategoryRecommendResponse[]>(
+        '/v1/main/products/categories',
+      );
 
       if (status !== 200) {
         throw new Error('카테고리 조회에 실패했습니다.');
@@ -51,7 +49,7 @@ export const mainApi = {
     } catch (err) {
       console.error('Error during getCategories:', err);
       toast.error('카테고리를 불러오는 중 오류가 발생했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 
@@ -67,7 +65,7 @@ export const mainApi = {
     } catch (err) {
       console.error('Error during getProductsByCategory:', err);
       toast.error('카테고리별 상품을 불러오는 중 오류가 발생했습니다.');
-      return Promise.reject(err);
+      throw err;
     }
   },
 };

@@ -1,18 +1,15 @@
-import { cartApi } from '@/api/cart-api';
-import { CART_KEYS } from '@/queries/keys';
+import { cartApi } from '@/api/cart';
+import { CART_KEYS } from '@/api/cart/keys';
 import { useAuthStore } from '@/store/auth-store';
 import { useQuery } from '@tanstack/react-query';
 
 export const useCartCount = () => {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
   return useQuery({
     queryKey: CART_KEYS.count(),
-    queryFn: () => {
-      if (useAuthStore().isAuthenticated) {
-        return cartApi.getCartItemCount();
-      }
-
-      return 0;
-    },
+    queryFn: () => cartApi.getCartItemCount(),
+    enabled: isAuthenticated,
     initialData: 0,
   });
 };
