@@ -1,4 +1,5 @@
-import { sellerApi } from '@/api/seller-api';
+import { useTopSellingProducts } from '@/api/seller/queries';
+import { LoadingEmpty } from '@/components/main/loading-empty';
 import { Badge } from '@/components/ui/badge';
 import {
   Empty,
@@ -8,37 +9,14 @@ import {
   EmptyTitle,
 } from '@/components/ui/empty';
 import { ChartColumnBig } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-/** 판매 상위 상품 목데이터 */
-const MOCK_TOP_PRODUCTS = [
-  { name: '저염 갓김치 500g', sold: 120 },
-  { name: '접이식 지팡이', sold: 95 },
-  { name: '무설탕 건강즙', sold: 80 },
-  { name: '확대 독서용 돋보기', sold: 54 },
-];
-
 export const DashboardTopProduct = () => {
-  const [topProducts, setTopProducts] = useState([]);
+  const { data: topProducts, isLoading } = useTopSellingProducts();
 
-  const format = (number) => new Intl.NumberFormat('ko-KR').format(number);
+  const format = (number: number) => new Intl.NumberFormat('ko-KR').format(number);
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const resp = await sellerApi.getTopProducts(4);
-
-        const formattedData = resp.data.map((item) => ({
-          name: item.productName,
-          sold: item.totalQuantitySold,
-        }));
-        setTopProducts(formattedData);
-      } catch (error) {
-        console.error('Failed to fetch top products:', error);
-      }
-    })();
-  }, []);
+  if (isLoading) return <LoadingEmpty />;
 
   return (
     <section className='bg-card mb-10 rounded-2xl border p-4'>
@@ -53,7 +31,7 @@ export const DashboardTopProduct = () => {
       </div>
 
       <div className='h-64'>
-        {topProducts.length === 0 ? (
+        {topProducts?.length === 0 ? (
           <Empty>
             <EmptyHeader>
               <EmptyMedia
@@ -85,7 +63,7 @@ export const DashboardTopProduct = () => {
               />
               <YAxis />
               <Tooltip
-                formatter={(value) => `${format(value)}개`}
+                formatter={(value: number) => `${format(value)}개`}
                 labelFormatter={(label) => `상품: ${label}`}
               />
               <Bar

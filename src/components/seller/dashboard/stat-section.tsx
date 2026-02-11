@@ -1,4 +1,7 @@
-import { sellerApi } from '@/api/seller-api';
+import { useUpdateMySellerInfo } from '@/api/seller/mutations';
+import { useDashboardStats } from '@/api/seller/queries';
+import { useGetProfile } from '@/api/user/queries';
+import { ErrorEmpty } from '@/components/main/error-empty';
 import { DashboardCard } from '@/components/seller/dashboard/dashbord-card';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,71 +26,46 @@ import { Item, ItemActions, ItemContent, ItemDescription, ItemTitle } from '@/co
 import { Spinner } from '@/components/ui/spinner';
 import { Link } from '@tanstack/react-router';
 import { Podcast, Tag } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { toast } from 'sonner';
+import { useState } from 'react';
 
 export const DashboardStatSection = () => {
-  const { user } = useSelector((state) => state.auth);
+  const { data: user } = useGetProfile();
+  const { data } = useDashboardStats();
+
+  const { mutateAsync: updateSellerInfo } = useUpdateMySellerInfo();
+
   const [sellerFormData, setSellerFormData] = useState({
     sellerName: '',
     sellerIntro: '',
   });
   const [submiting, setSubmitting] = useState(false);
   const [sellerInfoDialogOpen, setSellerInfoDialogOpen] = useState(false);
-  const [data, setData] = useState({
-    sellerName: '',
-    sellerId: '',
-    sellerIntro: '',
-    totalRevenue: 0,
-    totalOrderCount: 0,
-    refundRate: 0.0,
-    confirmedRate: 0.0,
-  });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const resp = await sellerApi.getDashboardStats();
-        setData(resp.data);
-        setSellerFormData({
-          sellerName: resp.data.sellerName,
-          sellerIntro: resp.data.sellerIntro,
-        });
-      } catch (error) {
-        console.error('Failed to fetch dashboard stats:', error);
-      }
-    })();
-  }, []);
-
-  const format = (num) => {
+  const format = (num: number) => {
     return num?.toLocaleString() || '0';
   };
 
-  const handleChangeSellerInfo = async (e) => {
+  const handleChangeSellerInfo = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await sellerApi.updateSellerInfo({
+      await updateSellerInfo({
         sellerName: sellerFormData.sellerName,
         sellerIntro: sellerFormData.sellerIntro,
       });
-
-      // 업데이트 후 페이지 새로고침
-      setData((prevData) => ({
-        ...prevData,
-        sellerName: sellerFormData.sellerName,
-        sellerIntro: sellerFormData.sellerIntro,
-      }));
-      toast.success('판매자 정보가 성공적으로 업데이트되었습니다.');
-    } catch (error) {
-      console.error('Failed to update seller info:', error);
-      toast.error('판매자 정보 업데이트에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setSubmitting(false);
       setSellerInfoDialogOpen(false);
     }
   };
+
+  if (!data)
+    return (
+      <ErrorEmpty
+        message='판매자 정보를 불러올 수 없습니다.'
+        prevPath='/seller'
+      />
+    );
 
   return (
     <section className='mb-4 flex flex-col gap-4'>
@@ -215,7 +193,7 @@ export const DashboardStatSection = () => {
         />
         <DashboardCard
           title='총 주문 수'
-          value={`${format(data.totalOrderCount)}건`}
+          value={`${format(data.totalOrders)}건`}
         />
         <DashboardCard
           title='구매 확정률'

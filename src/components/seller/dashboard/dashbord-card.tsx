@@ -1,6 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-export const DashboardCard = ({ title, value }) => {
+interface DashboardCardProps {
+  title: string;
+  value: string | number;
+}
+
+export const DashboardCard = ({ title, value }: DashboardCardProps) => {
   return (
     <Card className='rounded-2xl shadow-sm transition-shadow hover:shadow-md'>
       <CardHeader className='pb-2'>

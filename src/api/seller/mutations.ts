@@ -35,3 +35,20 @@ export const useUpdateOrderItemStatus = () => {
     },
   });
 };
+
+export const useUpdateMySellerInfo = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (sellerInfo: { sellerName: string; sellerIntro: string }) =>
+      sellerApi.updateSellerInfo(sellerInfo),
+    onSuccess: () => {
+      toast.success('판매자 정보가 변경되었습니다.');
+      queryClient.invalidateQueries({ queryKey: SELLER_KEYS.all });
+    },
+    onError: (error) => {
+      console.error('Failed to update seller info:', error);
+      toast.error('판매자 정보 변경에 실패했습니다.');
+    },
+  });
+};

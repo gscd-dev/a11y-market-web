@@ -6,8 +6,30 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Star, Upload, X } from 'lucide-react';
 
-export function ImageUploadSection({ images, onImagesChange, sectionType, disabled }) {
-  const handleFileSelect = (e) => {
+export interface UploadImage {
+  file?: File;
+  originalFileName?: string;
+  altText: string;
+  sequence: number;
+  imageUrl?: string;
+  imageId?: string;
+}
+
+interface ImageUploadSectionProps {
+  images: UploadImage[];
+  onImagesChange: (images: UploadImage[]) => void;
+  sectionType: 'product' | 'detail';
+  disabled?: boolean;
+}
+
+export function ImageUploadSection({
+  images,
+  onImagesChange,
+  sectionType,
+  disabled,
+}: ImageUploadSectionProps) {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
     const files = Array.from(e.target.files);
     const startSequence = sectionType === 'product' ? 0 : 10;
     const existingCount = images.filter((img) =>
@@ -19,28 +41,27 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
       originalFileName: file.name,
       altText: '',
       sequence: startSequence + existingCount + index,
-      preview: URL.createObjectURL(file),
     }));
 
     onImagesChange([...images, ...newImages]);
   };
 
-  const handleRemoveImage = (sequence) => {
+  const handleRemoveImage = (sequence: number) => {
     const filtered = images.filter((img) => img.sequence !== sequence);
     onImagesChange(filtered);
   };
 
-  const handleAltTextChange = (sequence, altText) => {
+  const handleAltTextChange = (sequence: number, altText: string) => {
     const updated = images.map((img) => (img.sequence === sequence ? { ...img, altText } : img));
     onImagesChange(updated);
   };
 
-  const handleSetMainImage = (sequence) => {
+  const handleSetMainImage = (sequence: number) => {
     const updated = images.map((img) => {
       if (img.sequence === sequence) {
         return { ...img, sequence: 0 };
       } else if (img.sequence === 0) {
-        return { ...img, sequence: sequence };
+        return { ...img, sequence: sequence }; // Swap with old main image
       }
       return img;
     });
@@ -76,7 +97,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
           <Button
             type='button'
             variant='outline'
-            onClick={() => document.getElementById(inputId).click()}
+            onClick={() => document.getElementById(inputId)?.click()}
             className='w-full'
             aria-label={`${sectionType === 'product' ? '상품' : '상세 정보'} 사진 추가`}
             disabled={disabled}
@@ -122,7 +143,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
                 <div className='space-y-3'>
                   <div className='relative aspect-video overflow-hidden rounded-md bg-gray-100'>
                     <ImageWithFallback
-                      src={image.preview || image.imageUrl}
+                      src={image.imageUrl || ''}
                       alt={
                         image.altText ||
                         `${sectionType === 'product' ? '상품' : '상세'} 사진 ${image.sequence + 1}`
@@ -176,7 +197,7 @@ export function ImageUploadSection({ images, onImagesChange, sectionType, disabl
                     </div>
 
                     <div className='flex items-center justify-between text-xs text-gray-500'>
-                      <span>{image.originalFileName}</span>
+                      <span>{image.originalFileName || 'No filename'}</span>
                       <span>순서: {image.sequence}</span>
                     </div>
 

@@ -1,4 +1,4 @@
-import { sellerApi } from '@/api/seller-api';
+import { sellerApi } from '@/api/seller';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -16,7 +16,29 @@ import { CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-export const UpdateStock = ({ productId, currentStock, onStockUpdate, variant, className }) => {
+interface UpdateStockProps {
+  productId: string;
+  currentStock: number;
+  onStockUpdate?: (productId: string, newStock: number) => void;
+  variant?:
+    | 'link'
+    | 'default'
+    | 'destructive'
+    | 'outline'
+    | 'secondary'
+    | 'ghost'
+    | null
+    | undefined;
+  className?: string;
+}
+
+export const UpdateStock = ({
+  productId,
+  currentStock,
+  onStockUpdate,
+  variant,
+  className,
+}: UpdateStockProps) => {
   const [newStock, setNewStock] = useState(currentStock);
   const [isSuccess, setIsSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -29,7 +51,7 @@ export const UpdateStock = ({ productId, currentStock, onStockUpdate, variant, c
       onStockUpdate && onStockUpdate(productId, newStock);
       toast.success('재고가 성공적으로 업데이트되었습니다.');
       setIsSuccess(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to update product stock:', err);
       toast.error(err.message || '재고 업데이트에 실패했습니다.');
     } finally {
@@ -64,9 +86,8 @@ export const UpdateStock = ({ productId, currentStock, onStockUpdate, variant, c
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel
-            variant='outline'
             onClick={() => setNewStock(currentStock)}
-            aira-label={isSuccess ? '닫기' : '취소'}
+            aria-label={isSuccess ? '닫기' : '취소'}
           >
             {isSuccess ? '닫기' : '취소'}
           </AlertDialogCancel>

@@ -1,7 +1,11 @@
 import { Badge } from '@/components/ui/badge';
 
-export function ClaimTypeBadge({ type }) {
-  const map = {
+interface ClaimTypeBadgeProps {
+  type: string;
+}
+
+export function ClaimTypeBadge({ type }: ClaimTypeBadgeProps) {
+  const map: Record<string, string> = {
     취소: 'bg-amber-50 text-amber-700 border-amber-200',
     반품: 'bg-rose-50 text-rose-700 border-rose-200',
     교환: 'bg-indigo-50 text-indigo-700 border-indigo-200',

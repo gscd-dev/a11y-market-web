@@ -1,7 +1,11 @@
 import { Badge } from '@/components/ui/badge';
 
-export function ClaimStatusBadge({ status }) {
-  const map = {
+interface ClaimStatusBadgeProps {
+  status: string;
+}
+
+export function ClaimStatusBadge({ status }: ClaimStatusBadgeProps) {
+  const map: Record<string, string> = {
     접수: 'bg-amber-50 text-amber-700 border-amber-200',
     처리중: 'bg-sky-50 text-sky-700 border-sky-200',
     완료: 'bg-emerald-50 text-emerald-700 border-emerald-200',

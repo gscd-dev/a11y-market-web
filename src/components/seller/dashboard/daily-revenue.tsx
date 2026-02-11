@@ -1,4 +1,4 @@
-import { sellerApi } from '@/api/seller-api';
+import { useDailyRevenue } from '@/api/seller/queries';
 import {
   Empty,
   EmptyDescription,
@@ -29,27 +29,23 @@ import {
 
 export const DashboardDailyRevenue = () => {
   const [selectedPeriod, setSelectedPeriod] = useState(`2025-11`);
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<{ date: string; sales: number }[]>([]);
+
+  const [selectedYear, selectedMonth] = selectedPeriod.split('-');
+  const { data: dailyRevenue } = useDailyRevenue(Number(selectedYear), Number(selectedMonth));
 
   useEffect(() => {
     (async () => {
-      const [selectedYear, selectedMonth] = selectedPeriod.split('-');
-      try {
-        const resp = await sellerApi.getDailyRevenue(selectedYear, selectedMonth);
+      const formattedData = dailyRevenue?.map((item) => ({
+        date: new Date(item.date).toLocaleDateString('ko-KR'),
+        sales: item.revenue,
+      }));
 
-        const formattedData = resp.data.map((item) => ({
-          date: new Date(item.orderDate).toLocaleDateString('ko-KR'),
-          sales: item.dailyRevenue,
-        }));
-
-        setData(formattedData);
-      } catch (error) {
-        console.error('일별 매출 데이터 조회 실패:', error);
-      }
+      setData(formattedData ?? []);
     })();
-  }, [selectedPeriod]);
+  }, [dailyRevenue]);
 
-  const format = (number) => new Intl.NumberFormat('ko-KR').format(number);
+  const format = (number: number) => new Intl.NumberFormat('ko-KR').format(number);
 
   return (
     <section className='bg-card mb-8 rounded-2xl border p-4'>
@@ -115,7 +111,7 @@ export const DashboardDailyRevenue = () => {
                 tick={{ fontSize: 11 }}
               />
               <Tooltip
-                formatter={(value) => `${format(value)}원`}
+                formatter={(value: number) => `${format(value)}원`}
                 labelFormatter={(label) => `날짜: ${label}`}
               />
               <Line

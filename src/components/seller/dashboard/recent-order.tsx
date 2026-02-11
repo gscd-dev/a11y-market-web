@@ -1,4 +1,4 @@
-import { sellerApi } from '@/api/seller-api';
+import { useRecentOrders } from '@/api/seller/queries';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,30 +14,34 @@ import { Link } from '@tanstack/react-router';
 import { ClipboardClock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+interface RecentOrder {
+  id: string;
+  itemId: string;
+  product: string;
+  price: number;
+  status: string;
+}
+
 export const DashboardRecentOrder = () => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<RecentOrder[]>([]);
+
+  const { data: recentOrders } = useRecentOrders();
 
   useEffect(() => {
     (async () => {
-      try {
-        const resp = await sellerApi.getRecentOrders(0, 3);
+      const formattedData = recentOrders?.map((item: any) => ({
+        id: item.orderId,
+        itemId: item.orderItemId,
+        product: item.productName,
+        price: item.productPrice * item.productQuantity,
+        status: item.orderItemStatus,
+      }));
 
-        const formattedData = resp.data.map((item) => ({
-          id: item.orderId,
-          itemId: item.orderItemId,
-          product: item.productName,
-          price: item.productPrice * item.productQuantity,
-          status: item.orderItemStatus,
-        }));
-
-        setData(formattedData);
-      } catch (error) {
-        console.error('Failed to fetch recent orders:', error);
-      }
+      setData(formattedData ?? []);
     })();
-  }, []);
+  }, [recentOrders]);
 
-  const format = (number) => new Intl.NumberFormat('ko-KR').format(number);
+  const format = (number: number) => new Intl.NumberFormat('ko-KR').format(number);
 
   return (
     <Card className='rounded-2xl'>

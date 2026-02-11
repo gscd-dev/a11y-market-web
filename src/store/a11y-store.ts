@@ -1,3 +1,4 @@
+import type { A11ySettings } from '@/api/a11y/types';
 import {
   A11yContrast,
   A11yLineHeight,
@@ -5,7 +6,6 @@ import {
   A11yTextSize,
   A11yTextSpacing,
 } from '@/lib/a11y/a11yEnums';
-import type { A11ySettings } from '@/types/a11y';
 import { create } from 'zustand';
 
 const A11Y_STORAGE_KEY = 'a11y-settings';
