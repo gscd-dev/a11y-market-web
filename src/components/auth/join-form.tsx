@@ -20,6 +20,30 @@ import { AlertCircleIcon, ArrowLeft, ArrowRight, CheckCircle2 } from 'lucide-rea
 import { useEffect, useRef, useState } from 'react';
 import { Spinner } from '../ui/spinner';
 
+interface Step {
+  id: string;
+  label: string;
+  type: string;
+  placeholder?: string;
+  autoComplete?: string;
+}
+
+interface JoinFormProps {
+  formTitle: string;
+  steps: Step[];
+  formData: Record<string, string>;
+  setFormData: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  errors: Record<string, string | null>;
+  setErrors: React.Dispatch<React.SetStateAction<Record<string, string | null>>>;
+  isCompleted: boolean;
+  isSubmitting: boolean;
+  submitCheckDialogOpen: boolean;
+  setSubmitCheckDialogOpen: (open: boolean) => void;
+  validateField: (id: string, value: string) => string | null;
+  validateCheckSteps: (id: string) => Promise<boolean>;
+  handleSubmit: (e: React.SubmitEvent) => void;
+}
+
 export const JoinForm = ({
   formTitle,
   steps,
@@ -34,11 +58,11 @@ export const JoinForm = ({
   validateField,
   validateCheckSteps,
   handleSubmit,
-}) => {
+}: JoinFormProps) => {
   const [currentStep, setCurrentStep] = useState(0);
 
-  const inputRef = useRef(null);
-  const focusRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const focusRef = useRef<HTMLButtonElement>(null);
 
   const navigate = useNavigate();
 
@@ -93,7 +117,7 @@ export const JoinForm = ({
     }
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const id = e.target.id;
 
@@ -103,7 +127,7 @@ export const JoinForm = ({
     }
   };
 
-  const handlePhoneChange = (e) => {
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Remove all non-numeric characters
     let value = e.target.value.replace(/[^0-9]/g, '');
 
@@ -120,7 +144,7 @@ export const JoinForm = ({
   };
 
   // Move next step on Enter key press
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleNext();
@@ -175,7 +199,10 @@ export const JoinForm = ({
   }
 
   return (
-    <form className='flex items-center justify-center bg-neutral-50 px-4 py-8'>
+    <form
+      className='flex items-center justify-center bg-neutral-50 px-4 py-8'
+      onSubmit={handleSubmit}
+    >
       <Card className='w-full max-w-md'>
         <CardHeader>
           <CardTitle>
@@ -378,7 +405,7 @@ export const JoinForm = ({
             <AlertDialogAction asChild>
               <Button
                 variant='default'
-                onClick={handleSubmit}
+                type='submit'
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
