@@ -1,4 +1,5 @@
-import { cartApi } from '@/api/cart-api';
+import { useDeleteCartItems, useUpdateCartItem } from '@/api/cart/mutations';
+import type { CartItem, CartItemGroup } from '@/api/cart/types';
 import { ImageWithFallback } from '@/components/image-with-fallback';
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
@@ -12,11 +13,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { fetchCartCount } from '@/store/cart-slice';
 import { MinusIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { toast } from 'sonner';
+
+interface CartGroupProps {
+  groupData: CartItemGroup;
+  onGroupDelete: (sellerId: string) => void;
+  selectedItems: Set<string>;
+  setSelectedItems: React.Dispatch<React.SetStateAction<Set<string>>>;
+  onChangeQuantity: (cartItemId: string, quantity: number) => void;
+}
 
 export const CartGroup = ({
   groupData,
@@ -24,11 +31,12 @@ export const CartGroup = ({
   selectedItems,
   setSelectedItems,
   onChangeQuantity,
-}) => {
-  const [data, setData] = useState(groupData.items);
-  const dispatch = useDispatch();
+}: CartGroupProps) => {
+  const [data, setData] = useState<CartItem[]>(groupData.items);
+  const updateCartItem = useUpdateCartItem();
+  const deleteCartItems = useDeleteCartItems();
 
-  const handleSelectItem = (cartItemId, isSelected) => {
+  const handleSelectItem = (cartItemId: string, isSelected: boolean) => {
     setSelectedItems((prevSelectedItems) => {
       const updatedSelectedItems = new Set(prevSelectedItems);
       if (isSelected) {
@@ -41,7 +49,7 @@ export const CartGroup = ({
   };
 
   //판매자 그룹 안에서만 동작하도록 수정
-  const handleSelectAll = (isSelected) => {
+  const handleSelectAll = (isSelected: boolean) => {
     if (isSelected) {
       const allIds = data.map((item) => item.cartItemId);
 
@@ -61,7 +69,7 @@ export const CartGroup = ({
     }
   };
 
-  const handleChangeQuantity = async (index, cartItemId, amount) => {
+  const handleChangeQuantity = async (index: number, cartItemId: string, amount: number) => {
     const oldData = data[index];
     const newQty = oldData.quantity + amount;
 
@@ -73,56 +81,36 @@ export const CartGroup = ({
 
     onChangeQuantity(cartItemId, newQty);
 
-    try {
-      const resp = await cartApi.updateCartItemQuantity(cartItemId, newData[index].quantity);
+    const resp = await updateCartItem.mutateAsync({
+      itemId: cartItemId,
+      quantity: newData[index].quantity,
+    });
 
-      if (resp.status !== 200) {
-        throw new Error('Failed to update cart item quantity');
-      }
-    } catch (err) {
-      console.error('Failed to update cart item quantity:', err);
-      toast.error('장바구니 아이템 수량 업데이트에 실패했습니다. 잠시 후 다시 시도해주세요.');
-
-      const revertedData = [...data];
-      revertedData[index] = oldData;
-      setData(revertedData);
-
-      onChangeQuantity(cartItemId, oldData.quantity);
-    }
+    onChangeQuantity(cartItemId, resp.quantity);
   };
 
-  const handleDelete = async (index) => {
+  const handleDelete = async (index: number) => {
     const newData = [...data];
     const removedItems = newData.splice(index, 1);
-    try {
-      const resp = await cartApi.deleteCartItems(removedItems.map((item) => item.cartItemId));
 
-      if (resp.status !== 204) {
-        throw new Error('Failed to delete cart items');
-      }
-      setData(newData);
+    await deleteCartItems.mutateAsync(removedItems.map((item) => item.cartItemId));
 
-      setSelectedItems((prev) => {
-        const updated = new Set();
-        prev.forEach((id) => {
-          if (!removedItems.some((r) => r.cartItemId === id)) {
-            updated.add(id);
-          }
-        });
-        return updated;
+    setData(newData);
+
+    setSelectedItems((prev) => {
+      const updated = new Set<string>();
+      prev.forEach((id) => {
+        if (!removedItems.some((r) => r.cartItemId === id)) {
+          updated.add(id);
+        }
       });
+      return updated;
+    });
 
-      dispatch(fetchCartCount());
+    toast.success('상품이 삭제되었습니다.');
 
-      toast.success('상품이 삭제되었습니다.');
-
-      if (newData.length === 0) {
-        // 현재 컴포넌트를 렌더링하는 상위 컴포넌트에서 이 그룹을 제거하도록 알림
-        onGroupDelete(groupData.sellerId);
-      }
-    } catch (error) {
-      console.error('Failed to delete cart items:', error);
-      toast.error('장바구니 아이템 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    if (newData.length === 0) {
+      onGroupDelete(groupData.sellerId);
     }
   };
 
@@ -134,7 +122,7 @@ export const CartGroup = ({
             <TableHead className='w-[5%] py-4 text-center'>
               <Checkbox
                 checked={data.every((item) => selectedItems.has(item.cartItemId))}
-                onCheckedChange={handleSelectAll}
+                onCheckedChange={(isSelected) => handleSelectAll(isSelected === true)}
                 className='size-6'
               />
             </TableHead>
@@ -162,7 +150,9 @@ export const CartGroup = ({
               <TableCell className='w-[5%] text-center'>
                 <Checkbox
                   checked={selectedItems.has(item.cartItemId)}
-                  onCheckedChange={(isSelected) => handleSelectItem(item.cartItemId, isSelected)}
+                  onCheckedChange={(isSelected) =>
+                    handleSelectItem(item.cartItemId, isSelected === true)
+                  }
                   className='size-6'
                 />
               </TableCell>
