@@ -1,5 +1,5 @@
+import { useCartCount } from '@/api/cart/queries';
 import { Badge } from '@/components/ui/badge';
-import { useCartCount } from '@/hooks/use-cart';
 
 export const CartBadge = () => {
   const { data: cartCount } = useCartCount();
