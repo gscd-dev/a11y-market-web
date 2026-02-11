@@ -1,16 +1,25 @@
+import { useGetCategories } from '@/api/category/queries';
+import type { Category } from '@/api/category/types';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Search, X } from 'lucide-react';
-import { useSelector } from 'react-redux';
 
-export const ProductFilter = ({ filters, setFilters }) => {
-  const { categories } = useSelector((state) => state.category);
+interface ProductFilterProps {
+  filters: {
+    searchQuery: string;
+    categories: string[];
+  };
+  setFilters: React.Dispatch<React.SetStateAction<ProductFilterProps['filters']>>;
+}
+
+export const ProductFilter = ({ filters, setFilters }: ProductFilterProps) => {
+  const { data: categories = [] } = useGetCategories();
 
   const { searchQuery, categories: selectedCategories } = filters;
 
-  const handleParentCategoryToggle = (parentCategory) => {
+  const handleParentCategoryToggle = (parentCategory: Category) => {
     const subCategories =
       categories
         .find((cat) => cat.categoryId === parentCategory.categoryId)
@@ -35,7 +44,7 @@ export const ProductFilter = ({ filters, setFilters }) => {
     }));
   };
 
-  const handleCategoryToggle = (categoryId) => {
+  const handleCategoryToggle = (categoryId: string) => {
     const newCategories = selectedCategories.includes(categoryId)
       ? selectedCategories.filter((id) => id !== categoryId) // 선택 해제
       : [...selectedCategories, categoryId]; // 선택 추가
@@ -46,7 +55,7 @@ export const ProductFilter = ({ filters, setFilters }) => {
     }));
   };
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setFilters((prev) => ({
       ...prev,
@@ -62,7 +71,7 @@ export const ProductFilter = ({ filters, setFilters }) => {
     }));
   };
 
-  const isParentCategorySelected = (parentCategory) => {
+  const isParentCategorySelected = (parentCategory: Category) => {
     const subCategorieIds = parentCategory.subCategories?.map((subCat) => subCat.categoryId) || [];
 
     if (subCategorieIds.length === 0) return false;
@@ -156,24 +165,6 @@ export const ProductFilter = ({ filters, setFilters }) => {
               </div>
             );
           })}
-          {/* {categories.map((category) => (
-            <div
-              key={category.id}
-              className='flex items-center gap-2'
-            >
-              <Checkbox
-                id={`category-${category.id}`}
-                checked={selectedCategories.includes(category.id)}
-                onCheckedChange={() => handleCategoryToggle(category.id)}
-              />
-              <Label
-                htmlFor={`category-${category.id}`}
-                className='cursor-pointer'
-              >
-                {category.name}
-              </Label>
-            </div>
-          ))} */}
         </div>
       </div>
     </div>
