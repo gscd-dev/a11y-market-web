@@ -1,7 +1,11 @@
-// src/components/product/SellerTrustInfo.jsx
 import { ShieldCheck } from 'lucide-react';
 
-function SellerTrustInfo({ sellerId, sellerName, sellerGrade, a11yGuarantee }) {
+interface SellerTrustInfoProps {
+  sellerGrade: string;
+  a11yGuarantee: boolean;
+}
+
+function SellerTrustInfo({ sellerGrade, a11yGuarantee }: SellerTrustInfoProps) {
   return (
     <div
       className='flex items-center gap-2 text-xs'
@@ -28,13 +32,6 @@ function SellerTrustInfo({ sellerId, sellerName, sellerGrade, a11yGuarantee }) {
       >
         {sellerGrade}
       </span>
-
-      {/* 판매자명 클릭 -> 판매자 스토어 페이지 (개발중) */}
-      {/* <Link to="/sellers/$sellerId"
-        params={{ sellerId }}
-        className="ml-2 text-xs font-medium text-gray-600 hover:underline">
-            {sellerName} &gt;
-        </Link> */}
     </div>
   );
 }

@@ -1,10 +1,11 @@
+import type { User } from '@/api/user/types';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Link } from '@tanstack/react-router';
-import { Button } from '../ui/button';
 
-function formatPhone(phone) {
+function formatPhone(phone: string) {
   if (!phone) return '-';
 
   const digits = phone.replace(/\D/g, '');
@@ -16,7 +17,11 @@ function formatPhone(phone) {
   return phone;
 }
 
-export default function ProfileInfo({ data }) {
+interface ProfileInfoProps {
+  data: User;
+}
+
+export default function ProfileInfo({ data }: ProfileInfoProps) {
   const { userName, userEmail, userPhone, userNickname, userRole, createdAt } = data;
 
   const showRole = userRole === 'SELLER' || userRole === 'ADMIN';
@@ -80,7 +85,7 @@ export default function ProfileInfo({ data }) {
   );
 }
 
-function InfoRow({ label, value }) {
+function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className='flex items-center justify-between py-3'>
       <span className='font-semibold'>{label}</span>
