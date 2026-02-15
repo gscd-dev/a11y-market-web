@@ -1,7 +1,7 @@
 services:
   webapp:
-    image: ghcr.io/gamesung-coding/a11y-market-web:latest
-    container_name: a11ymarket-web
+    image: ghcr.io/gscd-dev/a11y-market-web:latest
+    container_name: a11y-market-web
     restart: unless-stopped
     networks:
       - proxy
@@ -9,11 +9,11 @@ services:
       # Traefik setting
       - 'traefik.enable=true'
       # Router setting
-      - 'traefik.http.routers.a11ymarket-web.rule=Host(`${HOST_NAME}`)'
-      - 'traefik.http.routers.a11ymarket-web.entrypoints=websecure'
-      - 'traefik.http.routers.a11ymarket-web.tls=true'
+      - 'traefik.http.routers.a11y-market-web.rule=Host(`${HOST_NAME}`)'
+      - 'traefik.http.routers.a11y-market-web.entrypoints=websecure'
+      - 'traefik.http.routers.a11y-market-web.tls=true'
       # Service Setting
-      - 'traefik.http.services.a11ymarket-web.loadbalancer.server.port=80'
+      - 'traefik.http.services.a11y-market-web.loadbalancer.server.port=80'
 
 networks:
   proxy:

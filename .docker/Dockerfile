@@ -5,13 +5,19 @@ FROM node:22-slim AS builder
 # Set working directory
 WORKDIR /app
 
+# Enable corepack
+RUN corepack enable
+
 # Copy package.json and package-lock.json
-COPY package*.json ./
-RUN npm ci
+COPY .yarn ./.yarn
+COPY .yarnrc.yml ./.yarnrc.yml
+COPY package.json yarn.lock ./
+
+RUN yarn install --immutable
 
 # Copy source code
 COPY . .
-RUN npm run build
+RUN yarn build
 
 # 2. Final stage
 # Use nginx alpine image as final stage
